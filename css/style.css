@@ -52,6 +52,11 @@ html, body {
     display: none;
 }
 
+.menu-contents-project-resource input {
+    width: calc(100%/3);
+    box-sizing: border-box;
+}
+
 #area {
     position: absolute;
     width: 100%;

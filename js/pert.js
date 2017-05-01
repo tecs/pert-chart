@@ -91,6 +91,13 @@ class PERT
         this.ui('menu-contents').classList.add('menu-contents-project-loaded');
 
         const config = this.currentProject.getData();
+        const projectMenu = this.ui('menu-contents-project');
+        projectMenu.innerHTML = '<p>Resources</p>';
+
+        for (const id in config.resources) {
+            this.createResourceInputs(id);
+        }
+        this.createResourceInputs();
     }
 
     deleteProject()
@@ -98,6 +105,59 @@ class PERT
         this.config.unset(this.currentProjectName);
         this.config.commit();
         window.location.reload();
+    }
+
+    /**
+     * @param {String} [id]
+     */
+    createResourceInputs(id)
+    {
+        if (typeof id !== 'string') {
+            id = this.findFreeKey('r', this.currentProject.ns('resources'))
+        }
+        const elements = {name: null, amount: null, concurrency: null};
+        const config = this.currentProject.ns('resources').getData();
+        const resource = document.createElement('div');
+
+        for (const type in elements) {
+            elements[type] = document.createElement('input');
+            elements[type].type = 'text';
+            elements[type].placeholder = type;
+            elements[type].value = config[id] ? config[id][type] : '';
+            elements[type].addEventListener('change', e => this.updateResource(id, type, e.target));
+            resource.appendChild(elements[type]);
+        }
+
+        resource.className = 'menu-contents-project-resource';
+        this.ui('menu-contents-project').appendChild(resource);
+    }
+
+    /**
+     * @param {String} id
+     * @param {String} type
+     * @param {HTMLElement} element
+     */
+    updateResource(id, type, element)
+    {
+        const resources = this.currentProject.ns('resources');
+        let value = element.value;
+        if (type !== 'name') {
+            value = Math.max(0, parseFloat(value) || 0);
+        }
+        if (!resources.has(id)) {
+            resources.set(id, {name: null, amount: null, concurrency: null});
+            this.createResourceInputs();
+        }
+        if (type === 'name' && value === '') {
+            if (confirm('Are you sure you want to delete this resource?')) {
+                resources.unset(id);
+                element.parentNode.parentNode.removeChild(element.parentNode);
+            } else {
+                element.value = resources.get(id)[type];
+            }
+        } else {
+            element.value = resources.get(id)[type] = value;
+        }
     }
 
     initializeUi()
