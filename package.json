@@ -1,0 +1,29 @@
+{
+  "name": "pert-chart",
+  "version": "1.0.0",
+  "description": "A simple PERT chart maker and viewer",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tecs/pert-chart.git"
+  },
+  "keywords": [
+    "pert",
+    "chart",
+    "diagram",
+    "project",
+    "management"
+  ],
+  "author": "Alexander Ivanov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tecs/pert-chart/issues"
+  },
+  "homepage": "https://github.com/tecs/pert-chart#readme",
+  "dependencies": {
+    "bower": "^1.8.0"
+  }
+}
