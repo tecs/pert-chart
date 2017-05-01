@@ -35,3 +35,26 @@ html, body {
     border-right: none;
     border-left: 20px solid #A2A2A2;
 }
+
+#menu.menu-collapsed #menu-contents {
+    display: none;
+}
+
+#menu-contents-project {
+    padding: 10px;
+}
+
+.menu-contents-project-loaded #menu-contents-save, .menu-contents-project-loaded #menu-contents-delete {
+    display: inline;
+}
+
+#menu-contents-save, #menu-contents-delete {
+    display: none;
+}
+
+#area {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
