@@ -8,6 +8,18 @@ class PERT
         this.currentProjectName = null;
 
         this.initializeUi();
+
+        // Load the last opened project
+        const projects = [];
+        for (const name of this.config.keys()) {
+            const accessedAt = this.config.get(name).stats.accessedAt;
+            projects.push({name, accessedAt});
+        }
+        projects.sort((a, b) => b.accessedAt - a.accessedAt);
+        for (const project of projects) {
+            this.loadProject(project.name);
+            break;
+        }
     }
 
     /**
@@ -70,7 +82,16 @@ class PERT
     createProject(name)
     {
         this.config.reset();
-        this.config.set(name, { resources: {}, nodes: {}, edges: {}, stats: {} });
+        this.config.set(name, {
+            resources: {},
+            nodes: {},
+            edges: {},
+            stats: {
+                accessedAt: null,
+                modifiedAt: null,
+                createdAt: Date.now()
+            }
+        });
         this.config.commit();
         this.redrawProjectsSelector();
     }
@@ -98,6 +119,15 @@ class PERT
             this.createResourceInputs(id);
         }
         this.createResourceInputs();
+
+        config.stats.accessedAt = Date.now();
+        this.currentProject.commit();
+    }
+
+    saveProject()
+    {
+        this.currentProject.get('stats').modifiedAt = Date.now();
+        this.currentProject.commit();
     }
 
     deleteProject()
@@ -197,7 +227,7 @@ class PERT
             }
         });
 
-        this.ui('menu-contents-save').addEventListener('click', () => this.currentProject.commit());
+        this.ui('menu-contents-save').addEventListener('click', () => this.saveProject());
 
         this.ui('menu-contents-projects').addEventListener('change', e => {
             if (this.shouldStayOnPage()) {
