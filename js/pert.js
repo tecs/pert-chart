@@ -120,6 +120,10 @@ class PERT
         }
         this.createResourceInputs();
 
+        for (const id in config.nodes) {
+            this.drawNode(id);
+        }
+
         config.stats.accessedAt = Date.now();
         this.currentProject.commit();
     }
@@ -188,6 +192,85 @@ class PERT
         } else {
             element.value = resources.get(id)[type] = value;
         }
+        if (type === 'name') {
+            this.updateEdges();
+        }
+    }
+    /**
+     * @param {String} name
+     */
+    addNode(name)
+    {
+        const nodes = this.currentProject.ns('nodes');
+        const id = this.findFreeKey('n', nodes);
+        nodes.set(id, { name });
+
+        this.drawNode(id);
+    }
+
+    /**
+     * @param {String} id
+     */
+    deleteNode(id)
+    {
+        const node = this.ui(id);
+        node.parentNode.removeChild(node);
+        this.currentProject.ns('nodes').unset(id);
+    }
+
+    /**
+     * @param {String} id
+     */
+    drawNode(id)
+    {
+        const config = this.currentProject.ns('nodes').get(id);
+        const node = document.createElement('div');
+        node.id = id;
+        node.className = 'node';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = config.name;
+        node.appendChild(input);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.innerText = 'delete';
+        deleteButton.className = 'node-delete';
+        node.appendChild(deleteButton);
+
+        this.ui('area').appendChild(node);
+
+        this.updateEdge(id);
+
+        input.addEventListener('change', e => {
+            if (e.target.value === '') {
+                alert('Milestone name cannot be empty.');
+                e.target.value = config.name;
+            } else {
+                config.name = e.target.value;
+            }
+        });
+
+        deleteButton.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete the selected milestone? This action cannot be undone.')) {
+                this.deleteNode(id);
+            }
+        });
+    }
+
+    updateEdges()
+    {
+        for (const id of this.currentProject.ns('nodes').keys()) {
+            this.updateEdge(id);
+        }
+    }
+
+    /**
+     * @param {String} id
+     */
+    updateEdge(id)
+    {
+        throw "not implemented";
     }
 
     initializeUi()
@@ -204,7 +287,7 @@ class PERT
             let promptText = '';
             let newName = this.findFreeKey('Untitled Project ', this.config);
             while (true) {
-                promptText += 'Please enter a name for the project:';
+                promptText += 'Please enter a name for the new project:';
                 newName = prompt(promptText, newName);
                 if (newName === null) {
                     return;
@@ -228,6 +311,21 @@ class PERT
         });
 
         this.ui('menu-contents-save').addEventListener('click', () => this.saveProject());
+        this.ui('menu-contents-add-node').addEventListener('click', () => {
+            let newName, promptText = '';
+            while (true) {
+                promptText += 'Please enter a name for the new milestone:';
+                newName = prompt(promptText, newName);
+                if (newName === null) {
+                    return;
+                } else if (newName === '') {
+                    promptText = 'The new milestone name cannot be empty.\n';
+                } else {
+                    break;
+                }
+            }
+            this.addNode(newName);
+        });
 
         this.ui('menu-contents-projects').addEventListener('change', e => {
             if (this.shouldStayOnPage()) {
