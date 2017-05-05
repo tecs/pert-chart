@@ -86,6 +86,10 @@ class PERT
             resources: {},
             nodes: {},
             edges: {},
+            viewport: {
+                top: 0,
+                left: 0
+            },
             stats: {
                 accessedAt: null,
                 modifiedAt: null,
@@ -108,6 +112,10 @@ class PERT
         this.config.reset();
         this.currentProject = this.config.ns(name);
         this.currentProjectName = name;
+
+        const area = this.ui('area');
+        area.innerHTML = '';
+        this.repositionArea();
 
         this.ui('menu-contents').classList.add('menu-contents-project-loaded');
 
@@ -139,6 +147,14 @@ class PERT
         this.config.unset(this.currentProjectName);
         this.config.commit();
         window.location.reload();
+    }
+
+    repositionArea()
+    {
+        const area = this.ui('area');
+        const viewport = this.currentProject.get('viewport');
+        area.style.top = `calc(50% + ${viewport.top}px)`;
+        area.style.left = `calc(50% + ${viewport.left}px)`;
     }
 
     /**
@@ -203,7 +219,14 @@ class PERT
     {
         const nodes = this.currentProject.ns('nodes');
         const id = this.findFreeKey('n', nodes);
-        nodes.set(id, { name });
+
+        let left = 0;
+        for (const node of nodes) {
+            if (left < node.left + 320) {
+                left = node.left + 320;
+            }
+        }
+        nodes.set(id, { name, top: 0, left });
 
         this.drawNode(id);
     }
@@ -227,6 +250,8 @@ class PERT
         const node = document.createElement('div');
         node.id = id;
         node.className = 'node';
+        node.style.top = `${config.top}px`;
+        node.style.left = `${config.left}px`;
 
         const input = document.createElement('input');
         input.type = 'text';
