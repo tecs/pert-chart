@@ -193,7 +193,7 @@ class PERT
             element.value = resources.get(id)[type] = value;
         }
         if (type === 'name') {
-            this.updateEdges();
+            this.updateNodes();
         }
     }
     /**
@@ -240,7 +240,7 @@ class PERT
 
         this.ui('area').appendChild(node);
 
-        this.updateEdge(id);
+        this.updateNode(id);
 
         input.addEventListener('change', e => {
             if (e.target.value === '') {
@@ -258,17 +258,17 @@ class PERT
         });
     }
 
-    updateEdges()
+    updateNodes()
     {
         for (const id of this.currentProject.ns('nodes').keys()) {
-            this.updateEdge(id);
+            this.updateNode(id);
         }
     }
 
     /**
      * @param {String} id
      */
-    updateEdge(id)
+    updateNode(id)
     {
         throw "not implemented";
     }
