@@ -281,6 +281,31 @@ class PERT
                 this.deleteNode(id);
             }
         });
+
+        const moveListener = e => {
+            if (!e.target.movedata) {
+                return;
+            }
+            config.top = e.target.movedata.originalTop + (e.clientY - e.target.movedata.top);
+            config.left = e.target.movedata.originalLeft + (e.clientX - e.target.movedata.left);
+            node.style.top = `${config.top}px`;
+            node.style.left = `${config.left}px`;
+        };
+
+        node.addEventListener('mousedown', e => {
+            e.target.movedata = {
+                top: e.clientY,
+                left: e.clientX,
+                originalTop: config.top,
+                originalLeft: config.left
+            };
+            e.target.addEventListener('mousemove', moveListener);
+        });
+
+        node.addEventListener('mouseup', e => {
+            e.target.removeEventListener('mousemove', moveListener);
+            delete e.target.mocedata;
+        });
     }
 
     updateNodes()
