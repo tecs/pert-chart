@@ -269,29 +269,16 @@ class PERT
             }
         });
 
-        const moveListener = e => {
-            if (!e.target.movedata) {
-                return;
-            }
-            config.top = Math.max(e.target.movedata.originalTop + (e.clientY - e.target.movedata.top), 0);
-            config.left = Math.max(e.target.movedata.originalLeft + (e.clientX - e.target.movedata.left), 0);
-            node.style.top = `${config.top}px`;
-            node.style.left = `${config.left}px`;
-        };
-
         node.addEventListener('mousedown', e => {
-            e.target.movedata = {
+            this.moveNode = {
                 top: e.clientY,
                 left: e.clientX,
                 originalTop: config.top,
-                originalLeft: config.left
+                originalLeft: config.left,
+                node,
+                config
             };
-            e.target.addEventListener('mousemove', moveListener);
-        });
-
-        node.addEventListener('mouseup', e => {
-            e.target.removeEventListener('mousemove', moveListener);
-            delete e.target.movedata;
+            e.preventDefault();
         });
     }
 
@@ -370,6 +357,23 @@ class PERT
             }
             this.loadProject(e.target.options[e.target.selectedIndex].value);
         });
+
+        document.body.addEventListener('mousemove', e => {
+            if (!this.moveNode) {
+                return;
+            }
+            this.moveNode.config.top = Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0);
+            this.moveNode.config.left = Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0);
+            this.moveNode.node.style.top = `${this.moveNode.config.top}px`;
+            this.moveNode.node.style.left = `${this.moveNode.config.left}px`;
+        });
+
+        document.documentElement.addEventListener('mouseout', e => {
+            if (e.fromElement.tagName === 'HTML') {
+                this.moveNode = null;
+            }
+        });
+        document.body.addEventListener('mouseup', () => this.moveNode = null);
 
         window.addEventListener('beforeunload', e => {
             const message = this.shouldStayOnPage(null, true);
