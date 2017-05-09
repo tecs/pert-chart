@@ -304,7 +304,7 @@ class PERT
 
         node.addEventListener('mouseup', e => {
             e.target.removeEventListener('mousemove', moveListener);
-            delete e.target.mocedata;
+            delete e.target.movedata;
         });
     }
 
