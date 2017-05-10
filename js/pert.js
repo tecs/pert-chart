@@ -245,8 +245,12 @@ class PERT
         input.value = config.name;
         node.appendChild(input);
 
+        const drag = document.createElement('div');
+        drag.className = 'node-drag';
+        node.appendChild(drag);
+
         const deleteButton = document.createElement('button');
-        deleteButton.innerText = 'delete';
+        deleteButton.innerText = 'x';
         deleteButton.className = 'node-delete';
         node.appendChild(deleteButton);
 
@@ -269,7 +273,7 @@ class PERT
             }
         });
 
-        node.addEventListener('mousedown', e => {
+        drag.addEventListener('mousedown', e => {
             this.moveNode = {
                 top: e.clientY,
                 left: e.clientX,
@@ -359,13 +363,12 @@ class PERT
         });
 
         document.body.addEventListener('mousemove', e => {
-            if (!this.moveNode) {
-                return;
+            if (this.moveNode) {
+                this.moveNode.config.top = Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0);
+                this.moveNode.config.left = Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0);
+                this.moveNode.node.style.top = `${this.moveNode.config.top}px`;
+                this.moveNode.node.style.left = `${this.moveNode.config.left}px`;
             }
-            this.moveNode.config.top = Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0);
-            this.moveNode.config.left = Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0);
-            this.moveNode.node.style.top = `${this.moveNode.config.top}px`;
-            this.moveNode.node.style.left = `${this.moveNode.config.left}px`;
         });
 
         document.documentElement.addEventListener('mouseout', e => {
