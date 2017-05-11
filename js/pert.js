@@ -226,7 +226,7 @@ class PERT
                 left = node.left + 320;
             }
         }
-        nodes.set(id, {name, top, left});
+        nodes.set(id, {name, top, left, resources: {}});
 
         this.drawNode(id);
     }
@@ -236,7 +236,7 @@ class PERT
      */
     deleteNode(id)
     {
-        const node = this.ui(id);
+        const node = document.getElementById(id);
         node.parentNode.removeChild(node);
         this.currentProject.ns('nodes').unset(id);
         const edges = this.currentProject.ns('edges');
@@ -280,6 +280,10 @@ class PERT
         edgeLink.draggable = true;
         edgeLink.innerText = '↠';
         node.appendChild(edgeLink);
+
+        const resources = document.createElement('table');
+        resources.className = 'node-resources';
+        node.appendChild(resources);
 
         this.ui('area').appendChild(node);
 
@@ -372,7 +376,44 @@ class PERT
      */
     updateNode(id)
     {
-        throw "not implemented";
+        const resources = document.getElementById(id).querySelector('.node-resources');
+        const config = this.currentProject.get('resources');
+        const nodeResources = this.currentProject.ns('nodes').ns(id).get('resources');
+
+        resources.innerHTML = '';
+
+        for (const resourceId in nodeResources) {
+            if (!(resourceId in config)) {
+                delete nodeResources[resourceId];
+            }
+        }
+
+        for (const resourceId in config) {
+            if (!(resourceId in nodeResources)) {
+                nodeResources[resourceId] = 0;
+            }
+            const row = document.createElement('tr');
+            const cell1 = document.createElement('td');
+            const cell2 = cell1.cloneNode();
+
+            cell1.innerText = config[resourceId].name;
+            const resource = config[resourceId];
+            const input = document.createElement('input');
+            input.value = nodeResources[resourceId];
+            if (!nodeResources[resourceId]) {
+                cell1.className = cell2.className = 'empty';
+            }
+            cell2.appendChild(input);
+
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            resources.appendChild(row);
+
+            input.addEventListener('change', e => {
+                nodeResources[resourceId] = input.value = Math.max(0, parseFloat(input.value) || 0);
+                cell1.className = cell2.className = (input.value === '0' ? 'empty' : '');
+            });
+        }
     }
 
     /**
@@ -428,7 +469,6 @@ class PERT
     {
         const config = this.currentProject.ns('edges').get(id);
         this.currentProject.ns('edges').unset(id);
-        this.updateNode(config.to);
         this.ui('area').removeChild(document.getElementById(id));
     }
 
