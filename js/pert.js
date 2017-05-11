@@ -228,6 +228,13 @@ class PERT
         const node = this.ui(id);
         node.parentNode.removeChild(node);
         this.currentProject.ns('nodes').unset(id);
+        const edges = this.currentProject.ns('edges');
+        for (const edgeId of edges.keys()) {
+            const edge = edges.get(edgeId);
+            if (edge.from === id || edge.to === id) {
+                this.deleteEdge(edgeId);
+            }
+        }
     }
 
     /**
@@ -399,6 +406,17 @@ class PERT
         for (const id of this.currentProject.ns('edges').keys()) {
             this.drawEdge(id);
         }
+    }
+
+    /**
+     * @param {String} id
+     */
+    deleteEdge(id)
+    {
+        const config = this.currentProject.ns('edges').get(id);
+        this.currentProject.ns('edges').unset(id);
+        this.updateNode(config.to);
+        this.ui('area').removeChild(document.getElementById(id));
     }
 
     initializeUi()
