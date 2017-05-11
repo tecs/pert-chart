@@ -339,7 +339,6 @@ class PERT
         const node1 = nodeConfig.get(config.from);
         const node2 = nodeConfig.get(config.to);
         const edge = this.createEdge(node1.left + 300, node1.top + 50, node2.left, node2.top + 50, id);
-        console.log(edge)
         if (!edge.parentNode) {
             this.ui('area').appendChild(edge);
         }
