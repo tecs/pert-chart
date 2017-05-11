@@ -388,11 +388,17 @@ class PERT
             }
         }
 
+        const resourcesPerRow = Math.floor(((Object.keys(config).length || 1) - 1) / 3) + 1;
+        let i = 0;
+        let row = null;
         for (const resourceId in config) {
             if (!(resourceId in nodeResources)) {
                 nodeResources[resourceId] = 0;
             }
-            const row = document.createElement('tr');
+            if (!(i++ % resourcesPerRow)) {
+                row = document.createElement('tr');
+                resources.appendChild(row);
+            }
             const cell1 = document.createElement('td');
             const cell2 = cell1.cloneNode();
 
@@ -407,7 +413,6 @@ class PERT
 
             row.appendChild(cell1);
             row.appendChild(cell2);
-            resources.appendChild(row);
 
             input.addEventListener('change', e => {
                 nodeResources[resourceId] = input.value = Math.max(0, parseFloat(input.value) || 0);
