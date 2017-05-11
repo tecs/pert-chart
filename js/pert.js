@@ -250,6 +250,7 @@ class PERT
         node.style.left = `${config.left}px`;
 
         const input = document.createElement('input');
+        input.className = 'node-name';
         input.type = 'text';
         input.value = config.name;
         node.appendChild(input);
@@ -259,13 +260,14 @@ class PERT
         node.appendChild(drag);
 
         const deleteButton = document.createElement('button');
-        deleteButton.innerText = 'x';
+        deleteButton.innerText = '×';
         deleteButton.className = 'node-delete';
         node.appendChild(deleteButton);
 
         const edgeLink = document.createElement('div');
         edgeLink.className = 'node-edge';
         edgeLink.draggable = true;
+        edgeLink.innerText = '↠';
         node.appendChild(edgeLink);
 
         this.ui('area').appendChild(node);

@@ -69,7 +69,10 @@ html, body {
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
 }
 
-.node input {
+.node .node-name {
+    position: absolute;
+    top: 0;
+    left: 0;
     background: transparent;
     border: 0px none;
     padding: 5px;
@@ -78,28 +81,46 @@ html, body {
 }
 
 .node .node-delete {
+    position: absolute;
+    top: 0;
+    right: 0;
     width: 25px;
+    height: 20px;
+    padding: 0;
     display: none;
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    font-size: 20px;
+    line-height: 20px;
 }
 
 .node .node-drag {
+    position: absolute;
+    top: 0;
+    right: 25px;
     display: none;
     width: 50px;
     height: 20px;
-    background-color: #d0d0d0;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAYAAABS3WWCAAAAEElEQVQYV2NggIMZM2b4AgAFtAIWCad32AAAAABJRU5ErkJggg==);
     cursor: move;
 }
 
 .node .node-edge {
+    position: absolute;
+    top: 35px;
+    right: 0;
     display: none;
     width: 30px;
     height: 30px;
-    background-color: #d0d0d0;
     cursor: cell;
+    text-align: center;
+    font-size: 20px;
+    line-height: 30px;
 }
 
 .node:hover .node-delete, .node:hover .node-drag, .node:hover .node-edge {
-    display: inline-block;
+    display: block;
 }
 
 .edge {
