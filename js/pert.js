@@ -272,7 +272,7 @@ class PERT
         });
 
         deleteButton.addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete the selected milestone? This action cannot be undone.')) {
+            if (confirm('Are you sure you want to delete the selected milestone?')) {
                 this.deleteNode(id);
             }
         });
