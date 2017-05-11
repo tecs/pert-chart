@@ -127,6 +127,10 @@ class PERT
             this.drawNode(id);
         }
 
+        for (const id in config.edges) {
+            this.drawEdge(id);
+        }
+
         config.stats.accessedAt = Date.now();
         this.currentProject.commit();
     }
@@ -306,14 +310,15 @@ class PERT
      * @param {Number} y1
      * @param {Number} x2
      * @param {Number} y2
-     * @param {HTMLDivElement} edge
+     * @param {String} [id]
      * @returns {HTMLDivElement}
      */
-    createEdge(x1, y1, x2, y2, edge)
+    createEdge(x1, y1, x2, y2, id)
     {
-        if (!edge) {
-            edge = document.createElement('div');
+        const edge = document.getElementById(id) || document.createElement('div');
+        if (edge.className !== 'edge') {
             edge.className = 'edge';
+            edge.id = id;
         }
         const dx = x2 - x1;
         const dy = y2 - y1;
@@ -322,6 +327,22 @@ class PERT
         edge.style.width = `${Math.sqrt(dx*dx + dy*dy)}px`;
         edge.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
         return edge;
+    }
+
+    /**
+     * @param {String} id
+     */
+    drawEdge(id)
+    {
+        const config = this.currentProject.ns('edges').get(id);
+        const nodeConfig = this.currentProject.ns('nodes');
+        const node1 = nodeConfig.get(config.from);
+        const node2 = nodeConfig.get(config.to);
+        const edge = this.createEdge(node1.left + 300, node1.top + 50, node2.left, node2.top + 50, id);
+        console.log(edge)
+        if (!edge.parentNode) {
+            this.ui('area').appendChild(edge);
+        }
     }
 
     initializeUi()
