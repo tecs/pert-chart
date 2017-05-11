@@ -23,6 +23,17 @@ class PERT
     }
 
     /**
+     * @param {Number} number
+     * @param {Number} [precision=0]
+     * @returns {Number}
+     */
+    round(number, precision)
+    {
+        const multiplier = Math.pow(10, typeof precision === 'number' ? -precision : 0);
+        return multiplier * Math.round(number / multiplier);
+    }
+
+    /**
      * @param {String} name
      * @returns {HTMLElement}
      */
@@ -484,8 +495,14 @@ class PERT
 
         document.body.addEventListener('mousemove', e => {
             if (this.moveNode) {
-                this.moveNode.config.top = Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0);
-                this.moveNode.config.left = Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0);
+                this.moveNode.config.top = this.round(
+                    Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0),
+                    -1
+                );
+                this.moveNode.config.left = this.round(
+                    Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0),
+                    -1
+                );
                 this.moveNode.node.style.top = `${this.moveNode.config.top}px`;
                 this.moveNode.node.style.left = `${this.moveNode.config.left}px`;
                 this.redrawEdges();
