@@ -294,11 +294,12 @@ class PERT
 
 
         node.addEventListener('dragover', e => {
-            if (e.target.className !== 'node' || e.dataTransfer.types.indexOf(id) !== -1) {
+            const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeid').pop();
+            if (e.target.className !== 'node' || originalId === id) {
                 return;
             }
             for (const edge of this.currentProject.ns('edges')) {
-                if (edge.to === id) {
+                if (edge.from === originalId && edge.to === id) {
                     return;
                 }
             }
