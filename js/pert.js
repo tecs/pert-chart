@@ -301,6 +301,29 @@ class PERT
         throw "not implemented";
     }
 
+    /**
+     * @param {Number} x1
+     * @param {Number} y1
+     * @param {Number} x2
+     * @param {Number} y2
+     * @param {HTMLDivElement} edge
+     * @returns {HTMLDivElement}
+     */
+    createEdge(x1, y1, x2, y2, edge)
+    {
+        if (!edge) {
+            edge = document.createElement('div');
+            edge.className = 'edge';
+        }
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        edge.style.top = `${y1}px`;
+        edge.style.left = `${x1}px`;
+        edge.style.width = `${Math.sqrt(dx*dx + dy*dy)}px`;
+        edge.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+        return edge;
+    }
+
     initializeUi()
     {
         this.ui('menu-collapse').onclick = () => this.ui('menu').classList.toggle('menu-collapsed');

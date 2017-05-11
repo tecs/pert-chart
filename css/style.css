@@ -93,3 +93,10 @@ html, body {
 .node:hover .node-delete, .node:hover .node-drag {
     display: inline-block;
 }
+
+.edge {
+    position: absolute;
+    background: black;
+    height: 2px;
+    transform-origin: top left;
+}
