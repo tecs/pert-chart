@@ -90,7 +90,15 @@ html, body {
     cursor: move;
 }
 
-.node:hover .node-delete, .node:hover .node-drag {
+.node .node-edge {
+    display: none;
+    width: 30px;
+    height: 30px;
+    background-color: #d0d0d0;
+    cursor: cell;
+}
+
+.node:hover .node-delete, .node:hover .node-drag, .node:hover .node-edge {
     display: inline-block;
 }
 

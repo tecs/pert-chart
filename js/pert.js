@@ -258,6 +258,11 @@ class PERT
         deleteButton.className = 'node-delete';
         node.appendChild(deleteButton);
 
+        const edgeLink = document.createElement('div');
+        edgeLink.className = 'node-edge';
+        edgeLink.draggable = true;
+        node.appendChild(edgeLink);
+
         this.ui('area').appendChild(node);
 
         this.updateNode(id);
@@ -287,6 +292,51 @@ class PERT
                 config
             };
             e.preventDefault();
+        });
+
+
+        node.addEventListener('dragover', e => {
+            if (e.target.className !== 'node' || e.dataTransfer.types.indexOf(id) !== -1) {
+                return;
+            }
+            for (const edge of this.currentProject.ns('edges')) {
+                if (edge.to === id) {
+                    return;
+                }
+            }
+            e.preventDefault();
+        });
+        node.addEventListener('drop', e => {
+            this.currentProject.ns('edges').set(e.dataTransfer.getData('edgeid'), {
+                from: e.dataTransfer.getData('id'),
+                to: id
+            });
+            this.drawEdge(e.dataTransfer.getData('edgeid'));
+        });
+
+        edgeLink.addEventListener('dragstart', e => {
+            const edgeId = this.findFreeKey('e', this.currentProject.ns('edges'));
+            e.dataTransfer.dropEffect = 'move';
+            e.dataTransfer.setData(id, id);
+            e.dataTransfer.setData('id', id);
+            e.dataTransfer.setData('edgeid', edgeId);
+            e.target.redrawEdge = (x, y) => {
+                const edge = this.createEdge(config.left + 300, config.top + 50, x, y, edgeId);
+                if (!node.newedge) {
+                    node.newedge = edge;
+                    this.ui('area').appendChild(edge);
+                }
+            }
+        });
+
+        edgeLink.addEventListener('dragend', e => {
+            e.dataTransfer.clearData();
+            window.requestAnimationFrame(() => {
+                if (!this.currentProject.ns('edges').has(node.newedge.id)) {
+                    this.ui('area').removeChild(node.newedge);
+                }
+                delete node.newedge;
+            });
         });
     }
 
@@ -420,6 +470,12 @@ class PERT
             }
         });
         document.body.addEventListener('mouseup', () => this.moveNode = null);
+
+        document.body.addEventListener('drag', e => {
+            if (e.target.redrawEdge) {
+                e.target.redrawEdge(e.pageX, e.pageY);
+            }
+        });
 
         window.addEventListener('beforeunload', e => {
             const message = this.shouldStayOnPage(null, true);
