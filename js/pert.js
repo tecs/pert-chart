@@ -253,37 +253,19 @@ class PERT
      */
     drawNode(id)
     {
+        const template = this.ui('templates').import.getElementById('NodeTemplate').content;
+        const node = document.importNode(template, true).firstElementChild;
         const config = this.currentProject.ns('nodes').get(id);
-        const node = document.createElement('div');
         node.id = id;
-        node.className = 'node';
         node.style.top = `${config.top}px`;
         node.style.left = `${config.left}px`;
 
-        const input = document.createElement('input');
-        input.className = 'node-name';
-        input.type = 'text';
+        const input = node.querySelector('.node-name');
+        const deleteButton = node.querySelector('.node-delete');
+        const drag = node.querySelector('.node-drag');
+        const edgeLink = node.querySelector('.node-edge');
+
         input.value = config.name;
-        node.appendChild(input);
-
-        const drag = document.createElement('div');
-        drag.className = 'node-drag';
-        node.appendChild(drag);
-
-        const deleteButton = document.createElement('button');
-        deleteButton.innerText = '×';
-        deleteButton.className = 'node-delete';
-        node.appendChild(deleteButton);
-
-        const edgeLink = document.createElement('div');
-        edgeLink.className = 'node-edge';
-        edgeLink.draggable = true;
-        edgeLink.innerText = '↠';
-        node.appendChild(edgeLink);
-
-        const resources = document.createElement('table');
-        resources.className = 'node-resources';
-        node.appendChild(resources);
 
         this.ui('area').appendChild(node);
 
