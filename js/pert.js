@@ -127,9 +127,7 @@ class PERT
             this.drawNode(id);
         }
 
-        for (const id in config.edges) {
-            this.drawEdge(id);
-        }
+        this.redrawEdges();
 
         config.stats.accessedAt = Date.now();
         this.currentProject.commit();
@@ -336,6 +334,7 @@ class PERT
                     this.ui('area').removeChild(node.newedge);
                 }
                 delete node.newedge;
+                delete node.redrawEdge;
             });
         });
     }
@@ -391,6 +390,13 @@ class PERT
         const edge = this.createEdge(node1.left + 300, node1.top + 50, node2.left, node2.top + 50, id);
         if (!edge.parentNode) {
             this.ui('area').appendChild(edge);
+        }
+    }
+
+    redrawEdges()
+    {
+        for (const id of this.currentProject.ns('edges').keys()) {
+            this.drawEdge(id);
         }
     }
 
@@ -461,6 +467,7 @@ class PERT
                 this.moveNode.config.left = Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0);
                 this.moveNode.node.style.top = `${this.moveNode.config.top}px`;
                 this.moveNode.node.style.left = `${this.moveNode.config.left}px`;
+                this.redrawEdges();
             }
         });
 
