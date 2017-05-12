@@ -226,7 +226,7 @@ class PERT
                 left = node.left + 320;
             }
         }
-        nodes.set(id, {name, top, left, resources: {}});
+        nodes.set(id, {name, top, left, resources: {}, critical: false});
 
         this.drawNode(id);
     }
@@ -259,10 +259,14 @@ class PERT
         node.id = id;
         node.style.top = `${config.top}px`;
         node.style.left = `${config.left}px`;
+        if (config.critical) {
+            node.classList.add('critical');
+        }
 
         const input = node.querySelector('.node-name');
         const deleteButton = node.querySelector('.node-delete');
         const drag = node.querySelector('.node-drag');
+        const critical = node.querySelector('.node-critical');
         const edgeLink = node.querySelector('.node-edge');
 
         input.value = config.name;
@@ -301,7 +305,7 @@ class PERT
 
         node.addEventListener('dragover', e => {
             const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeid').pop();
-            if (e.target.className !== 'node' || originalId === id) {
+            if (!e.target.classList.contains('node') || originalId === id) {
                 return;
             }
             for (const edge of this.currentProject.ns('edges')) {
@@ -317,6 +321,17 @@ class PERT
                 to: id
             });
             this.drawEdge(e.dataTransfer.getData('edgeid'));
+        });
+
+        critical.addEventListener('click', () => {
+            if (config.critical) {
+                node.classList.remove('critical');
+                config.critical = false;
+            } else {
+                node.classList.add('critical');
+                config.critical = true;
+            }
+            this.redrawEdges();
         });
 
         edgeLink.addEventListener('dragstart', e => {
@@ -437,6 +452,11 @@ class PERT
         const node1 = nodeConfig.get(config.from);
         const node2 = nodeConfig.get(config.to);
         const edge = this.createEdge(node1.left + 300, node1.top + 50, node2.left, node2.top + 50, id);
+        if (node1.critical && node2.critical && !edge.classList.contains('critical')) {
+            edge.classList.add('critical');
+        } else if (!(node1.critical && node2.critical) && edge.classList.contains('critical')) {
+            edge.classList.remove('critical');
+        }
         if (!edge.parentNode) {
             this.ui('area').appendChild(edge);
         }
