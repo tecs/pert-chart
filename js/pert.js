@@ -521,6 +521,19 @@ class PERT
         });
 
         this.ui('menu-contents-save').addEventListener('click', () => this.saveProject());
+
+        this.ui('menu-contents-export').addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(this.currentProject.getPointers()[0])], { type: 'application/json' });
+            const reader = new FileReader();
+            reader.addEventListener('load', e => {
+                const link = document.createElement("a");
+                link.download = `${this.currentProjectName}.pert`;
+                link.href = e.target.result;
+                link.click();
+            });
+            reader.readAsDataURL(blob);
+        });
+
         this.ui('menu-contents-add-node').addEventListener('click', () => {
             let newName, promptText = '';
             while (true) {

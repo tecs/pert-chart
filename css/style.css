@@ -44,7 +44,7 @@ html, body {
     padding: 10px;
 }
 
-#menu-contents-save, #menu-contents-delete, #menu-contents-rename, #menu-contents-add-node {
+#menu-contents-save, #menu-contents-export, #menu-contents-delete, #menu-contents-rename, #menu-contents-add-node {
     display: none;
 }
 
