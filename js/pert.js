@@ -459,6 +459,33 @@ class PERT
         this.ui('area').removeChild(document.getElementById(id));
     }
 
+    /**
+     * @param {Boolean} [rename=false]
+     * @returns {String|null}
+     */
+    getNewProjectName(rename)
+    {
+        if (this.shouldStayOnPage()) {
+            return null;
+        }
+
+        let promptText = '';
+        let newName = rename ? this.currentProjectName : this.findFreeKey('Untitled Project ', this.config);
+        while (true) {
+            promptText += 'Please enter a ' + (rename ? 'new name for the' : 'name for the new') + ' project:';
+            newName = prompt(promptText, newName);
+            if (newName === null || (rename && newName === this.currentProjectName)) {
+                return null;
+            } else if (newName === '') {
+                promptText = 'The project name cannot be empty.\n';
+            } else if (this.config.has(newName)) {
+                promptText = 'A project with the selected name already exists.\n';
+            } else {
+                return newName;
+            }
+        }
+    }
+
     initializeUi()
     {
         this.ui('menu-collapse').onclick = () => this.ui('menu').classList.toggle('menu-collapsed');
@@ -466,57 +493,25 @@ class PERT
         this.redrawProjectsSelector();
 
         this.ui('menu-contents-new').addEventListener('click', () => {
-            if (this.shouldStayOnPage()) {
-                return;
-            }
+            const newName = this.getNewProjectName();
 
-            let promptText = '';
-            let newName = this.findFreeKey('Untitled Project ', this.config);
-            while (true) {
-                promptText += 'Please enter a name for the new project:';
-                newName = prompt(promptText, newName);
-                if (newName === null) {
-                    return;
-                } else if (newName === '') {
-                    promptText = 'The project name cannot be empty.\n';
-                } else if (this.config.has(newName)) {
-                    promptText = 'A project with the selected name already exists.\n';
-                } else {
-                    break;
-                }
+            if (newName !== null) {
+                this.createProject(newName);
+                this.loadProject(newName);
             }
-
-            this.createProject(newName);
-            this.loadProject(newName);
         });
 
         this.ui('menu-contents-rename').addEventListener('click', () => {
-            if (this.shouldStayOnPage()) {
-                return;
-            }
+            const newName = this.getNewProjectName(true);
 
-            let promptText = '';
-            let newName = this.currentProjectName;
-            while (true) {
-                promptText += 'Please enter a new name for the project:';
-                newName = prompt(promptText, newName);
-                if (newName === null || newName === this.currentProjectName) {
-                    return;
-                } else if (newName === '') {
-                    promptText = 'The new project name cannot be empty.\n';
-                } else if (this.config.has(newName)) {
-                    promptText = 'A project with the selected name already exists.\n';
-                } else {
-                    break;
-                }
+            if (newName !== null) {
+                this.config.reset();
+                this.config.set(newName, this.currentProject.getData());
+                this.config.unset(this.currentProjectName);
+                this.config.commit();
+                this.redrawProjectsSelector();
+                this.loadProject(newName);
             }
-
-            this.config.reset();
-            this.config.set(newName, this.currentProject.getData());
-            this.config.unset(this.currentProjectName);
-            this.config.commit();
-            this.redrawProjectsSelector();
-            this.loadProject(newName);
         });
 
         this.ui('menu-contents-delete').addEventListener('click', () => {
