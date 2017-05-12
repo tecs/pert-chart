@@ -478,7 +478,7 @@ class PERT
                 if (newName === null) {
                     return;
                 } else if (newName === '') {
-                    promptText = 'The new project name cannot be empty.\n';
+                    promptText = 'The project name cannot be empty.\n';
                 } else if (this.config.has(newName)) {
                     promptText = 'A project with the selected name already exists.\n';
                 } else {
@@ -487,6 +487,35 @@ class PERT
             }
 
             this.createProject(newName);
+            this.loadProject(newName);
+        });
+
+        this.ui('menu-contents-rename').addEventListener('click', () => {
+            if (this.shouldStayOnPage()) {
+                return;
+            }
+
+            let promptText = '';
+            let newName = this.currentProjectName;
+            while (true) {
+                promptText += 'Please enter a new name for the project:';
+                newName = prompt(promptText, newName);
+                if (newName === null || newName === this.currentProjectName) {
+                    return;
+                } else if (newName === '') {
+                    promptText = 'The new project name cannot be empty.\n';
+                } else if (this.config.has(newName)) {
+                    promptText = 'A project with the selected name already exists.\n';
+                } else {
+                    break;
+                }
+            }
+
+            this.config.reset();
+            this.config.set(newName, this.currentProject.getData());
+            this.config.unset(this.currentProjectName);
+            this.config.commit();
+            this.redrawProjectsSelector();
             this.loadProject(newName);
         });
 
