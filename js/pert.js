@@ -305,7 +305,11 @@ class PERT
 
         node.addEventListener('dragover', e => {
             const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeid').pop();
-            if (!e.target.classList.contains('node') || originalId === id) {
+            let element = e.target;
+            while (element && !element.classList.contains('node')) {
+                element = element.parentNode;
+            }
+            if (element && originalId === id) {
                 return;
             }
             for (const edge of this.currentProject.ns('edges')) {
