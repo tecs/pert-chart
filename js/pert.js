@@ -501,6 +501,32 @@ class PERT
             }
         });
 
+        this.ui('menu-contents-import').addEventListener('click', () => {
+            const newName = this.getNewProjectName();
+
+            if (newName !== null) {
+                const file = document.createElement('input');
+                file.type = 'file';
+                file.accept = '.pert';
+                file.addEventListener('change', e => {
+                    const reader = new FileReader();
+
+                    reader.addEventListener('load', () => {
+                        this.config.reset();
+                        this.config.set(newName, JSON.parse(reader.result));
+                        this.config.commit();
+                        this.redrawProjectsSelector();
+                        this.loadProject(newName);
+                    }, false);
+
+                    if (file.files.length) {
+                         reader.readAsText(file.files[0]);
+                    }
+                });
+                file.click();
+            }
+        });
+
         this.ui('menu-contents-rename').addEventListener('click', () => {
             const newName = this.getNewProjectName(true);
 
