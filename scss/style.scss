@@ -215,4 +215,19 @@ html, body {
         height: 2px;
         opacity: 1;
     }
+
+    &:hover:after {
+        position: relative;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin-left: -10px;
+        display: block;
+        content: "⨯";
+        transform: translate(0,-50%);
+        font-size: 23px;
+        text-align: center;
+        line-height: 20px;
+        cursor: pointer;
+    }
 }

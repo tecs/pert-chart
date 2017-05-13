@@ -438,9 +438,10 @@ class PERT
     createEdge(x1, y1, x2, y2, id)
     {
         const edge = document.getElementById(id) || document.createElement('div');
-        if (edge.className !== 'edge') {
-            edge.className = 'edge';
+        if (!edge.classList.contains('edge')) {
+            edge.classList.add('edge');
             edge.id = id;
+            edge.addEventListener('click', () => this.deleteEdge(id));
         }
         const dx = x2 - x1;
         const dy = y2 - y1;
