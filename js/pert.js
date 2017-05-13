@@ -344,6 +344,7 @@ class PERT
             e.dataTransfer.setData(id, id);
             e.dataTransfer.setData('id', id);
             e.dataTransfer.setData('edgeid', edgeId);
+            e.dataTransfer.setDragImage(new Image(), 0, 0);
             const xOffset = config.left + node.clientWidth,
                 yOffset = config.top + node.clientHeight / 2;
             e.target.redrawEdge = (x, y) => {
