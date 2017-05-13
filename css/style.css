@@ -1,192 +1,55 @@
-html, body {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-}
+html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFAFA; }
 
-#menu {
-    position: fixed;
-    height: 100%;
-    width: 300px;
-    z-index: 2;
-    left: 0;
-    bottom: 0;
-    box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-}
+#menu { position: fixed; height: 100%; width: 300px; z-index: 2; left: 0; bottom: 0; background: #FFF; box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); }
 
-#menu.menu-collapsed {
-    width: 30px;
-    height: 30px;
-}
+#menu #menu-collapse { position: absolute; left: 5px; bottom: 5px; cursor: pointer; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 20px solid #C5C5C5; }
 
-#menu-collapse {
-    position: absolute;
-    left: 5px;
-    bottom: 5px;
-    cursor: pointer;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-right: 20px solid #C5C5C5;
-}
+#menu.menu-collapsed { width: 30px; height: 30px; }
 
-#menu.menu-collapsed #menu-collapse {
-    left: 7px;
-    border-right: none;
-    border-left: 20px solid #A2A2A2;
-}
+#menu.menu-collapsed #menu-collapse { left: 7px; border-right: none; border-left: 20px solid #A2A2A2; }
 
-#menu.menu-collapsed #menu-contents {
-    display: none;
-}
+#menu.menu-collapsed #menu-contents { display: none; }
 
-#menu-contents-project {
-    padding: 10px;
-}
+#menu-contents-project { padding: 10px; }
 
-#menu-contents-save, #menu-contents-export, #menu-contents-delete, #menu-contents-rename, #menu-contents-add-node {
-    display: none;
-}
+#menu-contents-save, #menu-contents-export, #menu-contents-delete, #menu-contents-rename, #menu-contents-add-node { display: none; }
 
-.menu-contents-project-loaded > button {
-    display: inline !important;
-}
+.menu-contents-project-loaded > button { display: inline !important; }
 
-.menu-contents-project-resource input {
-    width: calc(100%/3);
-    box-sizing: border-box;
-}
+.menu-contents-project-resource input { width: calc(100%/3); box-sizing: border-box; }
 
-#area {
-    position: absolute;
-    z-index: 1;
-}
+#area { position: absolute; z-index: 1; }
 
-.node {
-    position: absolute;
-    width: 300px;
-    height: 100px;
-    box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-}
+.node { background: #FFF; position: absolute; width: 300px; height: 100px; box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); z-index: 2; }
 
-.node.critical {
-    box-shadow: 0 0 7px 1px rgba(0,0,0,0.7);
-}
+.node .node-name { position: absolute; top: 0; left: 0; background: transparent; border: none; padding: 5px; width: 200px; box-sizing: border-box; }
 
-.node .node-name {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: transparent;
-    border: none;
-    padding: 5px;
-    width: 200px;
-    box-sizing: border-box;
-}
+.node .node-delete { position: absolute; top: 0; right: 0; width: 25px; height: 20px; padding: 0; display: none; background: transparent; cursor: pointer; border: none; font-size: 20px; line-height: 20px; }
 
-.node .node-delete {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 25px;
-    height: 20px;
-    padding: 0;
-    display: none;
-    background: transparent;
-    cursor: pointer;
-    border: none;
-    font-size: 20px;
-    line-height: 20px;
-}
+.node .node-drag { position: absolute; top: 0; right: 50px; display: none; width: 50px; height: 20px; background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAYAAABS3WWCAAAAEElEQVQYV2NggIMZM2b4AgAFtAIWCad32AAAAABJRU5ErkJggg==); cursor: move; }
 
-.node .node-drag {
-    position: absolute;
-    top: 0;
-    right: 50px;
-    display: none;
-    width: 50px;
-    height: 20px;
-    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAYAAABS3WWCAAAAEElEQVQYV2NggIMZM2b4AgAFtAIWCad32AAAAABJRU5ErkJggg==);
-    cursor: move;
-}
+.node .node-critical { position: absolute; top: 0; right: 25px; width: 20px; height: 20px; display: none; border: none; border-radius: 10px; background: transparent; cursor: pointer; font-weight: bold; font-size: 16px; color: #A2A2A2; }
 
-.node .node-critical {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    width: 20px;
-    height: 20px;
-    display: none;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-    opacity: 0.2;
-}
+.node .node-edge { position: absolute; top: 30px; right: 0; bottom: 0; display: none; width: 20px; cursor: cell; text-align: center; font-size: 20px; line-height: 40px; }
 
-.node.critical .node-critical {
-    opacity: 1;
-    background: #BBB;
-    color: white;
-}
+.node .node-resources { position: absolute; top: 40px; left: 0; height: 60px; width: 280px; border-spacing: 1px; display: block; }
 
-.node .node-edge {
-    position: absolute;
-    top: 30px;
-    right: 0;
-    bottom: 0;
-    display: none;
-    width: 20px;
-    cursor: cell;
-    text-align: center;
-    font-size: 20px;
-    line-height: 40px;
-}
+.node .node-resources input { height: 100%; width: 100%; box-sizing: border-box; border: none; }
 
-.node-resources {
-    position: absolute;
-    top: 40px;
-    left: 0;
-    height: 60px;
-    width: 280px;
-    border-spacing: 1px;
-    display: block;
-}
+.node .node-resources td { padding: 0; }
 
-.node-resources input {
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    border: none;
-}
+.node .node-resources .empty { display: none; }
 
-.node-resources td {
-    padding: 0;
-}
+.node:hover { z-index: 3; }
 
-.node-resources .empty {
-    display: none;
-}
+.node:hover .node-resources .empty { display: table-cell; }
 
-.node:hover .node-resources .empty {
-    display: table-cell;
-}
+.node:hover > * { display: block; }
 
-.node:hover > * {
-    display: block;
-}
+.node.critical { box-shadow: 0 0 7px 1px rgba(0, 0, 0, 0.7); }
 
-.edge {
-    position: absolute;
-    background: black;
-    height: 1px;
-    transform-origin: top left;
-    opacity: 0.4;
-}
+.node.critical .node-critical { opacity: 1; background: #C5C5C5; color: white; }
 
-.edge.critical {
-    height: 2px;
-    opacity: 1;
-}
+.edge { position: absolute; background: black; height: 1px; transform-origin: top left; opacity: 0.4; z-index: 1; }
+
+.edge.critical { height: 2px; opacity: 1; }
