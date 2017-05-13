@@ -349,6 +349,7 @@ class PERT
                 yOffset = config.top + node.clientHeight / 2;
             e.target.redrawEdge = (x, y) => {
                 const edge = this.createEdge(xOffset, yOffset, x, y, edgeId);
+                edge.classList.add('edge-moving');
                 if (!node.newedge) {
                     node.newedge = edge;
                     this.ui('area').appendChild(edge);
@@ -362,6 +363,7 @@ class PERT
                 if (!this.currentProject.ns('edges').has(node.newedge.id)) {
                     this.ui('area').removeChild(node.newedge);
                 }
+                node.newedge.classList.remove('edge-moving');
                 delete node.newedge;
                 delete node.redrawEdge;
             });
