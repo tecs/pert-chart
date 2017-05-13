@@ -344,8 +344,10 @@ class PERT
             e.dataTransfer.setData(id, id);
             e.dataTransfer.setData('id', id);
             e.dataTransfer.setData('edgeid', edgeId);
+            const xOffset = config.left + node.clientWidth,
+                yOffset = config.top + node.clientHeight / 2;
             e.target.redrawEdge = (x, y) => {
-                const edge = this.createEdge(config.left + 300, config.top + 50, x, y, edgeId);
+                const edge = this.createEdge(xOffset, yOffset, x, y, edgeId);
                 if (!node.newedge) {
                     node.newedge = edge;
                     this.ui('area').appendChild(edge);
@@ -455,7 +457,12 @@ class PERT
         const nodeConfig = this.currentProject.ns('nodes');
         const node1 = nodeConfig.get(config.from);
         const node2 = nodeConfig.get(config.to);
-        const edge = this.createEdge(node1.left + 300, node1.top + 50, node2.left, node2.top + 50, id);
+        const nodeElement1 = document.getElementById(config.from);
+        const nodeElement2 = document.getElementById(config.to);
+        const xOffset = node1.left + nodeElement1.clientWidth,
+            yOffset1 = node1.top + nodeElement1.clientHeight / 2,
+            yOffset2 = node2.top + nodeElement2.clientHeight / 2;
+        const edge = this.createEdge(xOffset, yOffset1, node2.left, yOffset2, id);
         if (node1.critical && node2.critical && !edge.classList.contains('critical')) {
             edge.classList.add('critical');
         } else if (!(node1.critical && node2.critical) && edge.classList.contains('critical')) {
