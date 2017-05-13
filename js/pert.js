@@ -221,10 +221,10 @@ class PERT
         const id = this.findFreeKey('n', nodes);
 
         let top = 200, left = 400;
-        for (const node of nodes) {
-            if (left < node.left + 320) {
-                left = node.left + 320;
-            }
+        for (const nodeId of nodes.keys()) {
+            const nodeElement = document.getElementById(nodeId);
+            const node = nodes.get(nodeId);
+            left = Math.max(left, node.left + nodeElement.clientWidth + 20);
         }
         nodes.set(id, {name, top, left, resources: {}, critical: false});
 
