@@ -323,9 +323,27 @@ class PERT
             if (element && originalId === id) {
                 return;
             }
-            for (const edge of this.currentProject.ns('edges')) {
+            const edges = this.currentProject.ns('edges');
+            for (const edge of edges) {
                 if (edge.from === originalId && edge.to === id) {
                     return;
+                } else if (edge.from === id) {
+                    const loops = (function findLoops(next) {
+                        for (const edge of edges) {
+                            if (edge.from === next && edge.to === id) {
+                                return true;
+                            } else if (edge.from === next) {
+                                if (findLoops(edge.to)) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                    })(edge.to);
+
+                    if (loops) {
+                        return;
+                    }
                 }
             }
             e.preventDefault();
