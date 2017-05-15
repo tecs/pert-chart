@@ -323,30 +323,23 @@ class PERT
             if (element && originalId === id) {
                 return;
             }
-            const edges = this.currentProject.ns('edges');
-            for (const edge of edges) {
-                if (edge.from === originalId && edge.to === id) {
-                    return;
-                } else if (edge.from === id) {
-                    const loops = (function findLoops(next) {
-                        for (const edge of edges) {
-                            if (edge.from === next && edge.to === id) {
-                                return true;
-                            } else if (edge.from === next) {
-                                if (findLoops(edge.to)) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        }
-                    })(edge.to);
-
-                    if (loops) {
-                        return;
+            const edges = this.currentProject.get('edges');
+            const loops = (from, direct) => {
+                for (const edgeId in edges) {
+                    const edge = edges[edgeId];
+                    if (direct && edge.from === from && edge.to === id) {
+                        return true;
+                    } else if (direct && loops(id)) {
+                        return true;
+                    } else if (!direct && edge.from === from && (edge.to === originalId || loops(edge.to))) {
+                        return true;
                     }
                 }
+                return false;
+            };
+            if (!loops(originalId, true)) {
+                e.preventDefault();
             }
-            e.preventDefault();
         });
         node.addEventListener('drop', e => {
             this.currentProject.ns('edges').set(e.dataTransfer.getData('edgeid'), {
