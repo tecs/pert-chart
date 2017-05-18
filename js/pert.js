@@ -137,6 +137,7 @@ class PERT
         for (const id in config.nodes) {
             this.drawNode(id);
         }
+        this.recalculateDateConstraints();
 
         this.redrawEdges();
 
@@ -401,12 +402,7 @@ class PERT
                 } else {
                     e.target.classList.remove('empty');
                 }
-
-                if (name === 'start') {
-                    all[1 - index].min = value;
-                } else {
-                    all[1 - index].max = value;
-                }
+                this.recalculateDateConstraints();
             });
         });
     }
@@ -416,6 +412,67 @@ class PERT
         for (const id of this.currentProject.ns('nodes').keys()) {
             this.updateNode(id);
         }
+    }
+
+    recalculateDateConstraints()
+    {
+        const nodes = this.currentProject.get('nodes');
+        const edges = this.currentProject.get('edges');
+        const nodeInputs = {};
+        const left = [], right = [];
+        for (const nodeId in nodes) {
+            nodeInputs[nodeId] = document.getElementById(nodeId).querySelectorAll('.node-dates input');
+            nodeInputs[nodeId][0].min = '';
+            nodeInputs[nodeId][0].max = '';
+            nodeInputs[nodeId][1].min = '';
+            nodeInputs[nodeId][1].max = '';
+
+            let isFirst = true, isLast = true;
+            for (const edgeId in edges) {
+                const edge = edges[edgeId];
+                if (edge.from === nodeId) {
+                    isLast = false;
+                } else if (edge.to === nodeId) {
+                    isFirst = false;
+                }
+            }
+            if (isFirst) {
+                left.push(nodeId);
+            }
+            if (isLast) {
+                right.push(nodeId);
+            }
+        }
+        const updateConstraints = (nodeId, backwards, limit) => {
+            const neighbours = [];
+            for (const edgeId in edges) {
+                if (backwards && edges[edgeId].to === nodeId) {
+                    neighbours.push(edges[edgeId].from);
+                } else if (!backwards && edges[edgeId].from === nodeId) {
+                    neighbours.push(edges[edgeId].to);
+                }
+            }
+            const inputs = nodeInputs[nodeId];
+            const node = nodes[nodeId];
+            if (backwards) {
+                if (inputs[1].max && (!limit || inputs[1].max < limit)) {
+                    limit = inputs[1].max;
+                }
+                inputs[1].max = limit;
+                inputs[0].max = node.end || inputs[1].max;
+                limit = node.start || inputs[0].max;
+            } else {
+                if (inputs[0].min && (!limit || inputs[0].min > limit)) {
+                    limit = inputs[0].min;
+                }
+                inputs[0].min = limit;
+                inputs[1].min = node.start || inputs[0].min;
+                limit = node.end || inputs[1].min;
+            }
+            neighbours.forEach(neighbour => updateConstraints(neighbour, backwards, limit));
+        };
+        left.forEach(nodeId => updateConstraints(nodeId, false, ''));
+        right.forEach(nodeId => updateConstraints(nodeId, true, ''));
     }
 
     /**
