@@ -227,7 +227,7 @@ class PERT
             const node = nodes.get(nodeId);
             left = Math.max(left, node.left + nodeElement.clientWidth + 20);
         }
-        nodes.set(id, {name, top, left, resources: {}, critical: false, start: null, end: null});
+        nodes.set(id, {name, top, left, resources: {}, critical: false, start: '', end: ''});
 
         this.drawNode(id);
     }
@@ -272,16 +272,14 @@ class PERT
         const dates = node.querySelectorAll('.node-dates input');
 
         input.value = config.name;
-        if (config.start === null) {
+        if (!config.start) {
             dates[0].className = 'empty';
-        } else {
-            dates[0].value = config.start;
         }
-        if (config.end === null) {
+        if (!config.end) {
             dates[1].className = 'empty';
-        } else {
-            dates[1].value = config.end;
         }
+        dates[0].value = config.start;
+        dates[1].value = config.end;
 
         this.ui('area').appendChild(node);
 
@@ -395,12 +393,10 @@ class PERT
         dates.forEach((node, index, all) => {
             const name = index ? 'end' : 'start';
             node.addEventListener('change', (e) => {
-                const value = e.target.value !== '' ? e.target.value : null;
-                config[name] = value;
-                if (value === null) {
-                    e.target.classList.add('empty');
-                } else {
+                if (config[name] = e.target.value) {
                     e.target.classList.remove('empty');
+                } else {
+                    e.target.classList.add('empty');
                 }
                 this.recalculateDateConstraints();
             });
