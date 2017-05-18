@@ -431,7 +431,14 @@ class PERT
     {
         const nodes = this.currentProject.get('nodes');
         const edges = this.currentProject.get('edges');
-        const nodeInputs = {};
+        const nodeInputs = {
+            project: this.ui('menu-contents-project').querySelectorAll('.project-dates input')
+        };
+        nodeInputs.project[0].min = '';
+        nodeInputs.project[0].max = '';
+        nodeInputs.project[1].min = '';
+        nodeInputs.project[1].max = '';
+
         const left = [], right = [];
         for (const nodeId in nodes) {
             nodeInputs[nodeId] = document.getElementById(nodeId).querySelectorAll('.node-dates input');
@@ -484,8 +491,19 @@ class PERT
             }
             neighbours.forEach(neighbour => updateConstraints(neighbour, backwards, limit));
         };
-        left.forEach(nodeId => updateConstraints(nodeId, false, ''));
-        right.forEach(nodeId => updateConstraints(nodeId, true, ''));
+        left.forEach(nodeId => updateConstraints(nodeId, false, nodeInputs.project[0].value));
+        right.forEach(nodeId => updateConstraints(nodeId, true, nodeInputs.project[1].value));
+
+        left.forEach(nodeId => {
+            if (!nodeInputs.project[0].max || nodeInputs.project[0].max < nodeInputs[nodeId][1].min) {
+                nodeInputs.project[0].max = nodeInputs[nodeId][1].min;
+            }
+        });
+        right.forEach(nodeId => {
+            if (!nodeInputs.project[1].min || nodeInputs.project[1].min > nodeInputs[nodeId][0].max) {
+                nodeInputs.project[1].min = nodeInputs[nodeId][0].max;
+            }
+        });
     }
 
     /**
