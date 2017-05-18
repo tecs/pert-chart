@@ -101,7 +101,9 @@ class PERT
                 accessedAt: null,
                 modifiedAt: null,
                 createdAt: Date.now()
-            }
+            },
+            start: '',
+            end: ''
         });
         this.config.commit();
         this.redrawProjectsSelector();
@@ -127,7 +129,22 @@ class PERT
 
         const config = this.currentProject.getData();
         const projectMenu = this.ui('menu-contents-project');
-        projectMenu.innerHTML = '<p>Resources</p>';
+
+        const template = this.ui('templates').import.getElementById('ProjectTemplate').content;
+        const project = document.importNode(template, true).firstElementChild;
+        projectMenu.appendChild(project);
+
+        const dates = project.querySelectorAll('.project-dates input');
+        dates[0].value = config.start;
+        dates[1].value = config.end;
+
+        dates.forEach((node, index, all) => {
+            const name = index ? 'end' : 'start';
+            node.addEventListener('change', (e) => {
+                config[name] = e.target.value;
+                this.recalculateDateConstraints();
+            });
+        });
 
         for (const id in config.resources) {
             this.createResourceInputs(id);

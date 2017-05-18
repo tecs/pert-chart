@@ -52,6 +52,24 @@ html, body {
 
 #menu-contents-project {
     padding: 10px;
+
+    .project-dates {
+        left: 0;
+        right: 20px;
+        bottom: 0;
+        height: 20px;
+
+        input {
+            width: 50%;
+            float: left;
+            box-sizing: border-box;
+            border: none;
+        }
+
+        input:last-child {
+            float: right;
+        }
+    }
 }
 
 #menu-contents-save,

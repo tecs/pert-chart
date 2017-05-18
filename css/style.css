@@ -13,6 +13,12 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 #menu-contents-project { padding: 10px; }
 
+#menu-contents-project .project-dates { left: 0; right: 20px; bottom: 0; height: 20px; }
+
+#menu-contents-project .project-dates input { width: 50%; float: left; box-sizing: border-box; border: none; }
+
+#menu-contents-project .project-dates input:last-child { float: right; }
+
 #menu-contents-save, #menu-contents-export, #menu-contents-delete, #menu-contents-rename, #menu-contents-add-node { display: none; }
 
 .menu-contents-project-loaded > button { display: inline !important; }
