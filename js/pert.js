@@ -27,7 +27,7 @@ class PERT
      * @param {Number} [precision=0]
      * @returns {Number}
      */
-    round(number, precision)
+    static round(number, precision)
     {
         const multiplier = Math.pow(10, typeof precision === 'number' ? -precision : 0);
         return multiplier * Math.round(number / multiplier);
@@ -48,8 +48,9 @@ class PERT
     /**
      * @param {String} prefix
      * @param {DataStore} config
+     * @returns {String}
      */
-    findFreeKey(prefix, config)
+    static findFreeKey(prefix, config)
     {
         let key, i=0;
         do {
@@ -138,9 +139,9 @@ class PERT
         dates[0].value = config.start;
         dates[1].value = config.end;
 
-        dates.forEach((node, index, all) => {
+        dates.forEach((node, index) => {
             const name = index ? 'end' : 'start';
-            node.addEventListener('change', (e) => {
+            node.addEventListener('change', e => {
                 config[name] = e.target.value;
                 this.recalculateDateConstraints();
             });
@@ -181,7 +182,7 @@ class PERT
     createResourceInputs(id)
     {
         if (typeof id !== 'string') {
-            id = this.findFreeKey('r', this.currentProject.ns('resources'))
+            id = PERT.findFreeKey('r', this.currentProject.ns('resources'));
         }
         const elements = {name: null, amount: null, concurrency: null};
         const config = this.currentProject.ns('resources').getData();
@@ -236,9 +237,10 @@ class PERT
     addNode(name)
     {
         const nodes = this.currentProject.ns('nodes');
-        const id = this.findFreeKey('n', nodes);
+        const id = PERT.findFreeKey('n', nodes);
 
-        let top = 200, left = 400;
+        const top = 200;
+        let left = 400;
         for (const nodeId of nodes.keys()) {
             const nodeElement = document.getElementById(nodeId);
             const node = nodes.get(nodeId);
@@ -330,7 +332,6 @@ class PERT
             e.preventDefault();
         });
 
-
         node.addEventListener('dragover', e => {
             const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeid').pop();
             let element = e.target;
@@ -378,7 +379,7 @@ class PERT
         });
 
         edgeLink.addEventListener('dragstart', e => {
-            const edgeId = this.findFreeKey('e', this.currentProject.ns('edges'));
+            const edgeId = PERT.findFreeKey('e', this.currentProject.ns('edges'));
             e.dataTransfer.dropEffect = 'move';
             e.dataTransfer.setData(id, id);
             e.dataTransfer.setData('id', id);
@@ -393,7 +394,7 @@ class PERT
                     node.newedge = edge;
                     this.ui('area').appendChild(edge);
                 }
-            }
+            };
         });
 
         edgeLink.addEventListener('dragend', e => {
@@ -408,10 +409,11 @@ class PERT
             });
         });
 
-        dates.forEach((node, index, all) => {
+        dates.forEach((node, index) => {
             const name = index ? 'end' : 'start';
-            node.addEventListener('change', (e) => {
-                if (config[name] = e.target.value) {
+            node.addEventListener('change', e => {
+                config[name] = e.target.value;
+                if (config[name]) {
                     e.target.classList.remove('empty');
                 } else {
                     e.target.classList.add('empty');
@@ -432,9 +434,7 @@ class PERT
     {
         const nodes = this.currentProject.get('nodes');
         const edges = this.currentProject.get('edges');
-        const nodeInputs = {
-            project: this.ui('menu-contents-project').querySelectorAll('.project-dates input')
-        };
+        const nodeInputs = {project: this.ui('menu-contents-project').querySelectorAll('.project-dates input')};
         nodeInputs.project[0].min = '';
         nodeInputs.project[0].max = '';
         nodeInputs.project[1].min = '';
@@ -539,7 +539,6 @@ class PERT
             const cell2 = cell1.cloneNode();
 
             cell1.innerText = config[resourceId].name;
-            const resource = config[resourceId];
             const input = document.createElement('input');
             input.value = nodeResources[resourceId];
             if (!nodeResources[resourceId]) {
@@ -551,8 +550,8 @@ class PERT
             row.appendChild(cell2);
 
             input.addEventListener('change', e => {
-                nodeResources[resourceId] = input.value = Math.max(0, parseFloat(input.value) || 0);
-                cell1.className = cell2.className = (input.value === '0' ? 'empty' : '');
+                nodeResources[resourceId] = e.target.value = Math.max(0, parseFloat(e.target.value) || 0);
+                cell1.className = cell2.className = (e.target.value === '0' ? 'empty' : '');
             });
         }
     }
@@ -619,7 +618,6 @@ class PERT
      */
     deleteEdge(id)
     {
-        const config = this.currentProject.ns('edges').get(id);
         this.currentProject.ns('edges').unset(id);
         this.ui('area').removeChild(document.getElementById(id));
     }
@@ -635,9 +633,9 @@ class PERT
         }
 
         let promptText = '';
-        let newName = rename ? this.currentProjectName : this.findFreeKey('Untitled Project ', this.config);
-        while (true) {
-            promptText += 'Please enter a ' + (rename ? 'new name for the' : 'name for the new') + ' project:';
+        let newName = rename ? this.currentProjectName : PERT.findFreeKey('Untitled Project ', this.config);
+        for (;;) {
+            promptText += `Please enter a ${rename ? 'new name for the' : 'name for the new'} project:`;
             newName = prompt(promptText, newName);
             if (newName === null || (rename && newName === this.currentProjectName)) {
                 return null;
@@ -673,7 +671,7 @@ class PERT
                 const file = document.createElement('input');
                 file.type = 'file';
                 file.accept = '.pert';
-                file.addEventListener('change', e => {
+                file.addEventListener('change', () => {
                     const reader = new FileReader();
 
                     reader.addEventListener('load', () => {
@@ -685,7 +683,7 @@ class PERT
                     }, false);
 
                     if (file.files.length) {
-                         reader.readAsText(file.files[0]);
+                        reader.readAsText(file.files[0]);
                     }
                 });
                 file.click();
@@ -714,10 +712,10 @@ class PERT
         this.ui('menu-contents-save').addEventListener('click', () => this.saveProject());
 
         this.ui('menu-contents-export').addEventListener('click', () => {
-            const blob = new Blob([JSON.stringify(this.currentProject.getPointers()[0])], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(this.currentProject.getPointers()[0])], {type: 'application/json'});
             const reader = new FileReader();
             reader.addEventListener('load', e => {
-                const link = document.createElement("a");
+                const link = document.createElement('a');
                 link.download = `${this.currentProjectName}.pert`;
                 link.href = e.target.result;
                 link.click();
@@ -727,7 +725,7 @@ class PERT
 
         this.ui('menu-contents-add-node').addEventListener('click', () => {
             let newName, promptText = '';
-            while (true) {
+            for (;;) {
                 promptText += 'Please enter a name for the new milestone:';
                 newName = prompt(promptText, newName);
                 if (newName === null) {
@@ -750,11 +748,11 @@ class PERT
 
         document.body.addEventListener('mousemove', e => {
             if (this.moveNode) {
-                this.moveNode.config.top = this.round(
+                this.moveNode.config.top = PERT.round(
                     Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0),
                     -1
                 );
-                this.moveNode.config.left = this.round(
+                this.moveNode.config.left = PERT.round(
                     Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0),
                     -1
                 );
@@ -785,6 +783,6 @@ class PERT
             }
         });
     }
-};
+}
 
 window.onload = () => new PERT();
