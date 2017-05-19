@@ -133,6 +133,8 @@ class PERT
 
         const template = this.ui('templates').import.getElementById('ProjectTemplate').content;
         const project = document.importNode(template, true).firstElementChild;
+
+        projectMenu.innerHTML = '';
         projectMenu.appendChild(project);
 
         const dates = project.querySelectorAll('.project-dates input');
