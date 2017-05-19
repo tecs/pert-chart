@@ -229,9 +229,7 @@ class PERT
         } else {
             element.value = resources.get(id)[type] = value;
         }
-        if (type === 'name') {
-            this.updateNodes();
-        }
+        this.updateNodes();
     }
     /**
      * @param {String} name
@@ -432,6 +430,44 @@ class PERT
         }
     }
 
+    recaculateResourceConstraints()
+    {
+        const nodes = this.currentProject.get('nodes');
+        const nodesOrdered = this
+            .currentProject
+            .ns('nodes')
+            .keys()
+            .sort((a, b) => (nodes[a].start || nodes[a].end) > (nodes[b].start || nodes[b].end) ? 1 : -1);
+        const resources = this.currentProject.get('resources');
+        const resourcesLeft = {};
+        for (const resourceId in resources) {
+            resourcesLeft[resourceId] = resources[resourceId].amount;
+        }
+        for (const nodeId of nodesOrdered) {
+            const node = nodes[nodeId];
+            const nodeElement = document.getElementById(nodeId);
+            if (!nodeElement) {
+                continue;
+            }
+            const resourceCells = nodeElement.querySelectorAll('.node-resources td');
+
+            nodeElement.classList.remove('red');
+
+            for (const resourceId in node.resources) {
+                resourcesLeft[resourceId] -= node.resources[resourceId];
+                const index = Object.keys(node.resources).indexOf(resourceId) * 2;
+                if (node.resources[resourceId] && resourcesLeft[resourceId] < 0) {
+                    resourceCells[index].classList.add('red');
+                    resourceCells[index+1].classList.add('red');
+                    nodeElement.classList.add('red');
+                } else {
+                    resourceCells[index].classList.remove('red');
+                    resourceCells[index+1].classList.remove('red');
+                }
+            }
+        }
+    }
+
     recalculateDateConstraints()
     {
         const nodes = this.currentProject.get('nodes');
@@ -554,8 +590,10 @@ class PERT
             input.addEventListener('change', e => {
                 nodeResources[resourceId] = e.target.value = Math.max(0, parseFloat(e.target.value) || 0);
                 cell1.className = cell2.className = (e.target.value === '0' ? 'empty' : '');
+                this.recaculateResourceConstraints();
             });
         }
+        this.recaculateResourceConstraints();
     }
 
     /**
