@@ -5,7 +5,6 @@ class PERT
         this.config = new DataStore('pert'); // eslint-disable-line no-undef
         this.uiCache = {};
         this.currentProject = null;
-        this.currentProjectName = null;
 
         this.initializeUi();
 
@@ -94,18 +93,7 @@ class PERT
     createProject(name)
     {
         this.config.reset();
-        this.config.set(name, {
-            resources: {},
-            nodes: {},
-            edges: {},
-            stats: {
-                accessedAt: null,
-                modifiedAt: null,
-                createdAt: Date.now()
-            },
-            start: '',
-            end: ''
-        });
+        this.config.set(name, {});
         this.config.commit();
         this.redrawProjectsSelector();
     }
@@ -120,15 +108,14 @@ class PERT
         }
 
         this.config.reset();
-        this.currentProject = this.config.ns(name);
-        this.currentProjectName = name;
+        this.currentProject = new Project(name, this.config.ns(name)); // eslint-disable-line no-undef
 
         const area = this.ui('area');
         area.innerHTML = '';
 
         this.ui('menu-contents').classList.add('menu-contents-project-loaded');
 
-        const config = this.currentProject.getData();
+        const config = this.currentProject.configData;
         const projectMenu = this.ui('menu-contents-project');
 
         const template = this.ui('templates').import.getElementById('ProjectTemplate').content;
@@ -160,20 +147,11 @@ class PERT
         this.recalculateDateConstraints();
 
         this.redrawEdges();
-
-        config.stats.accessedAt = Date.now();
-        this.currentProject.commit();
-    }
-
-    saveProject()
-    {
-        this.currentProject.get('stats').modifiedAt = Date.now();
-        this.currentProject.commit();
     }
 
     deleteProject()
     {
-        this.config.unset(this.currentProjectName);
+        this.config.unset(this.currentProject.name);
         this.config.commit();
         window.location.reload();
     }
@@ -184,10 +162,10 @@ class PERT
     createResourceInputs(id)
     {
         if (typeof id !== 'string') {
-            id = PERT.findFreeKey('r', this.currentProject.ns('resources'));
+            id = PERT.findFreeKey('r', this.currentProject.config.ns('resources'));
         }
         const elements = {name: null, amount: null, concurrency: null};
-        const config = this.currentProject.ns('resources').getData();
+        const config = this.currentProject.config.ns('resources').getData();
         const resource = document.createElement('div');
 
         for (const type in elements) {
@@ -210,7 +188,7 @@ class PERT
      */
     updateResource(id, type, element)
     {
-        const resources = this.currentProject.ns('resources');
+        const resources = this.currentProject.config.ns('resources');
         let value = element.value;
         if (type !== 'name') {
             value = Math.max(0, parseFloat(value) || 0);
@@ -236,7 +214,7 @@ class PERT
      */
     addNode(name)
     {
-        const nodes = this.currentProject.ns('nodes');
+        const nodes = this.currentProject.config.ns('nodes');
         const id = PERT.findFreeKey('n', nodes);
 
         const top = 200;
@@ -259,8 +237,8 @@ class PERT
     {
         const node = document.getElementById(id);
         node.parentNode.removeChild(node);
-        this.currentProject.ns('nodes').unset(id);
-        const edges = this.currentProject.ns('edges');
+        this.currentProject.config.ns('nodes').unset(id);
+        const edges = this.currentProject.config.ns('edges');
         for (const edgeId of edges.keys()) {
             const edge = edges.get(edgeId);
             if (edge.from === id || edge.to === id) {
@@ -276,7 +254,7 @@ class PERT
     {
         const template = this.ui('templates').import.getElementById('NodeTemplate').content;
         const node = document.importNode(template, true).firstElementChild;
-        const config = this.currentProject.ns('nodes').get(id);
+        const config = this.currentProject.config.ns('nodes').get(id);
         node.id = id;
         node.style.top = `${config.top}px`;
         node.style.left = `${config.left}px`;
@@ -341,7 +319,7 @@ class PERT
             if (element && originalId === id) {
                 return;
             }
-            const edges = this.currentProject.get('edges');
+            const edges = this.currentProject.config.get('edges');
             const loops = (from, direct) => {
                 for (const edgeId in edges) {
                     const edge = edges[edgeId];
@@ -360,7 +338,7 @@ class PERT
             }
         });
         node.addEventListener('drop', e => {
-            this.currentProject.ns('edges').set(e.dataTransfer.getData('edgeid'), {
+            this.currentProject.config.ns('edges').set(e.dataTransfer.getData('edgeid'), {
                 from: e.dataTransfer.getData('id'),
                 to: id
             });
@@ -379,7 +357,7 @@ class PERT
         });
 
         edgeLink.addEventListener('dragstart', e => {
-            const edgeId = PERT.findFreeKey('e', this.currentProject.ns('edges'));
+            const edgeId = PERT.findFreeKey('e', this.currentProject.config.ns('edges'));
             e.dataTransfer.dropEffect = 'move';
             e.dataTransfer.setData(id, id);
             e.dataTransfer.setData('id', id);
@@ -400,7 +378,7 @@ class PERT
         edgeLink.addEventListener('dragend', e => {
             e.dataTransfer.clearData();
             window.requestAnimationFrame(() => {
-                if (!this.currentProject.ns('edges').has(node.newedge.id)) {
+                if (!this.currentProject.config.ns('edges').has(node.newedge.id)) {
                     this.ui('area').removeChild(node.newedge);
                 }
                 node.newedge.classList.remove('edge-moving');
@@ -425,20 +403,21 @@ class PERT
 
     updateNodes()
     {
-        for (const id of this.currentProject.ns('nodes').keys()) {
+        for (const id of this.currentProject.config.ns('nodes').keys()) {
             this.updateNode(id);
         }
     }
 
     recaculateResourceConstraints()
     {
-        const nodes = this.currentProject.get('nodes');
+        const nodes = this.currentProject.config.get('nodes');
         const nodesOrdered = this
             .currentProject
+            .config
             .ns('nodes')
             .keys()
             .sort((a, b) => (nodes[a].start || nodes[a].end) > (nodes[b].start || nodes[b].end) ? 1 : -1);
-        const resources = this.currentProject.get('resources');
+        const resources = this.currentProject.config.get('resources');
         const resourcesLeft = {};
         for (const resourceId in resources) {
             resourcesLeft[resourceId] = resources[resourceId].amount;
@@ -470,8 +449,8 @@ class PERT
 
     recalculateDateConstraints()
     {
-        const nodes = this.currentProject.get('nodes');
-        const edges = this.currentProject.get('edges');
+        const nodes = this.currentProject.config.get('nodes');
+        const edges = this.currentProject.config.get('edges');
         const nodeInputs = {project: this.ui('menu-contents-project').querySelectorAll('.project-dates input')};
         nodeInputs.project[0].min = '';
         nodeInputs.project[0].max = '';
@@ -551,8 +530,8 @@ class PERT
     updateNode(id)
     {
         const resources = document.getElementById(id).querySelector('.node-resources');
-        const config = this.currentProject.get('resources');
-        const nodeResources = this.currentProject.ns('nodes').ns(id).get('resources');
+        const config = this.currentProject.config.get('resources');
+        const nodeResources = this.currentProject.config.ns('nodes').ns(id).get('resources');
 
         resources.innerHTML = '';
 
@@ -626,8 +605,8 @@ class PERT
      */
     drawEdge(id)
     {
-        const config = this.currentProject.ns('edges').get(id);
-        const nodeConfig = this.currentProject.ns('nodes');
+        const config = this.currentProject.config.ns('edges').get(id);
+        const nodeConfig = this.currentProject.config.ns('nodes');
         const node1 = nodeConfig.get(config.from);
         const node2 = nodeConfig.get(config.to);
         const nodeElement1 = document.getElementById(config.from);
@@ -648,7 +627,7 @@ class PERT
 
     redrawEdges()
     {
-        for (const id of this.currentProject.ns('edges').keys()) {
+        for (const id of this.currentProject.config.ns('edges').keys()) {
             this.drawEdge(id);
         }
     }
@@ -658,7 +637,7 @@ class PERT
      */
     deleteEdge(id)
     {
-        this.currentProject.ns('edges').unset(id);
+        this.currentProject.config.ns('edges').unset(id);
         this.ui('area').removeChild(document.getElementById(id));
     }
 
@@ -673,11 +652,11 @@ class PERT
         }
 
         let promptText = '';
-        let newName = rename ? this.currentProjectName : PERT.findFreeKey('Untitled Project ', this.config);
+        let newName = rename ? this.currentProject.name : PERT.findFreeKey('Untitled Project ', this.config);
         for (;;) {
             promptText += `Please enter a ${rename ? 'new name for the' : 'name for the new'} project:`;
             newName = prompt(promptText, newName);
-            if (newName === null || (rename && newName === this.currentProjectName)) {
+            if (newName === null || (rename && newName === this.currentProject.name)) {
                 return null;
             } else if (newName === '') {
                 promptText = 'The project name cannot be empty.\n';
@@ -735,8 +714,8 @@ class PERT
 
             if (newName !== null) {
                 this.config.reset();
-                this.config.set(newName, this.currentProject.getData());
-                this.config.unset(this.currentProjectName);
+                this.config.set(newName, this.currentProject.configData);
+                this.config.unset(this.currentProject.name);
                 this.config.commit();
                 this.redrawProjectsSelector();
                 this.loadProject(newName);
@@ -749,14 +728,15 @@ class PERT
             }
         });
 
-        this.ui('menu-contents-save').addEventListener('click', () => this.saveProject());
+        this.ui('menu-contents-save').addEventListener('click', () => this.currentProject.save());
 
         this.ui('menu-contents-export').addEventListener('click', () => {
-            const blob = new Blob([JSON.stringify(this.currentProject.getPointers()[0])], {type: 'application/json'});
+            const json = JSON.stringify(this.currentProject.config.getPointers()[0]);
+            const blob = new Blob([json], {type: 'application/json'});
             const reader = new FileReader();
             reader.addEventListener('load', e => {
                 const link = document.createElement('a');
-                link.download = `${this.currentProjectName}.pert`;
+                link.download = `${this.currentProject.name}.pert`;
                 link.href = e.target.result;
                 link.click();
             });
