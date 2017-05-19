@@ -247,6 +247,7 @@ class PERT
         nodes.set(id, {name, top, left, resources: {}, critical: false, start: '', end: ''});
 
         this.drawNode(id);
+        this.recalculateDateConstraints();
     }
 
     /**
