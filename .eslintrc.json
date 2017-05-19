@@ -13,7 +13,13 @@
         "quotes": ["error", "single"],
         "semi": ["error", "always"],
         "camelcase": "error",
-        "valid-jsdoc": "error",
+        "valid-jsdoc": ["error", {
+            "prefer": {"return": "returns", "arg": "param", "argument": "param", "virtual": "abstract"},
+            "preferType": {"boolean": "Boolean", "number": "Number", "object": "Object", "string": "String"},
+            "requireParamDescription": false,
+            "requireReturnDescription": false,
+            "requireReturn": false
+        }],
         "class-methods-use-this": "error",
         "curly": ["error", "all"],
         "eqeqeq": ["error", "always"],
