@@ -131,6 +131,8 @@ class Project
                 this.deleteEdge(edgeId);
             }
         }
+        this.recalculateDateConstraints();
+        this.recaculateResourceConstraints();
     }
 
     /**
