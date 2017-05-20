@@ -64,9 +64,20 @@ class Project
         this.save();
     }
 
+    /**
+     * @returns {Object}
+     */
     get configData()
     {
         return this.config.getData();
+    }
+
+    /**
+     * @returns {Object}
+     */
+    get originalConfig()
+    {
+        return this.config.getPointers()[0];
     }
 
     /**

@@ -194,7 +194,7 @@ class PERT
         this.ui('menu-contents-save').addEventListener('click', () => this.currentProject.save());
 
         this.ui('menu-contents-export').addEventListener('click', () => {
-            const json = JSON.stringify(this.currentProject.config.getPointers()[0]);
+            const json = JSON.stringify(this.currentProject.originalConfig);
             const blob = new Blob([json], {type: 'application/json'});
             const reader = new FileReader();
             reader.addEventListener('load', e => {
