@@ -474,13 +474,15 @@ class Project
         right.forEach(nodeId => updateConstraints(nodeId, true, nodeInputs.project[1].value));
 
         left.forEach(nodeId => {
-            if (!nodeInputs.project[0].max || nodeInputs.project[0].max < nodeInputs[nodeId][1].min) {
-                nodeInputs.project[0].max = nodeInputs[nodeId][1].min;
+            const value = nodeInputs[nodeId][0].value || nodeInputs[nodeId][1].value || nodeInputs[nodeId][1].max;
+            if (!nodeInputs.project[0].max || (value && nodeInputs.project[0].max > value)) {
+                nodeInputs.project[0].max = value;
             }
         });
         right.forEach(nodeId => {
-            if (!nodeInputs.project[1].min || nodeInputs.project[1].min > nodeInputs[nodeId][0].max) {
-                nodeInputs.project[1].min = nodeInputs[nodeId][0].max;
+            const value = nodeInputs[nodeId][1].value || nodeInputs[nodeId][0].value || nodeInputs[nodeId][0].min;
+            if (!nodeInputs.project[1].min || (value && nodeInputs.project[1].min < value)) {
+                nodeInputs.project[1].min = value;
             }
         });
     }
