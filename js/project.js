@@ -242,6 +242,7 @@ class Project
                 config.critical = true;
             }
             this.redrawEdges();
+            this.recaculateResourceConstraints();
         });
 
         edgeLink.addEventListener('dragstart', e => {
@@ -487,20 +488,24 @@ class Project
                 nodeInputs.project[1].min = value;
             }
         });
+        this.recaculateResourceConstraints();
     }
 
     recaculateResourceConstraints()
     {
         const nodes = this.config.get('nodes');
+        const edges = this.config.get('edges');
         const nodesOrdered = this
             .config
             .ns('nodes')
             .keys()
             .sort((a, b) => (nodes[a].start || nodes[a].end) > (nodes[b].start || nodes[b].end) ? 1 : -1);
         const resources = this.config.get('resources');
-        const resourcesLeft = {};
+        const resourcesLeft = {}, concurrencies = {};
+        const events = [];
         for (const resourceId in resources) {
             resourcesLeft[resourceId] = resources[resourceId].amount;
+            concurrencies[resourceId] = resources[resourceId].concurrency;
         }
         for (const nodeId of nodesOrdered) {
             const node = nodes[nodeId];
@@ -523,8 +528,46 @@ class Project
                     resourceCells[index].classList.remove('red');
                     resourceCells[index+1].classList.remove('red');
                 }
+
+                if (resources[resourceId].concurrency && node.resources[resourceId]) {
+                    const dates = nodeElement.querySelectorAll('.node-dates input');
+                    events.push({nodeId, resourceId, start: true, time: dates[0].value || dates[1].min});
+                    events.push({nodeId, resourceId, start: false, time: dates[1].value || dates[0].max || 'z'});
+                }
             }
         }
+        const getLevel = nodeId => {
+            for (const edgeId in edges) {
+                if (edges[edgeId].to === nodeId) {
+                    return getLevel(edges[edgeId].from) + 1;
+                }
+            }
+            return 1;
+        };
+        events.sort((a, b) => {
+            if (a.time !== b.time) {
+                return a.time > b.time ? 1 : -1;
+            }
+            if (a.start !== b.start) {
+                return a.start ? 1 : -1;
+            }
+            if (nodes[a.nodeId].critical !== nodes[b.nodeId].critical) {
+                return nodes[a.nodeId].critical ? -1 : 1;
+            }
+            return getLevel(a.nodeId) > getLevel(b.nodeId) ? 1 : -1;
+        }).forEach(({nodeId, resourceId, start}) => {
+            concurrencies[resourceId] += start ? -1 : 1;
+            if (concurrencies[resourceId] < 0 && start) {
+                const node = nodes[nodeId];
+                const nodeElement = document.getElementById(nodeId);
+                const resourceCells = nodeElement.querySelectorAll('.node-resources td');
+                const index = Object.keys(node.resources).indexOf(resourceId) * 2;
+
+                resourceCells[index].classList.add('red');
+                resourceCells[index+1].classList.add('red');
+                nodeElement.classList.add('red');
+            }
+        });
     }
 
         /**
