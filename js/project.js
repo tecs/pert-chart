@@ -408,7 +408,7 @@ class Project
         }
 
         resource.className = 'menu-contents-project-resource';
-        this.ui('menu-contents-project').appendChild(resource);
+        this.ui('menu-contents-project').querySelector('.project-resources').appendChild(resource);
     }
 
     /**
