@@ -5,6 +5,7 @@ class PERT
         this.config = new DataStore('pert'); // eslint-disable-line no-undef
         this.uiCache = {};
         this.currentProject = null;
+        this.currentStats = null;
 
         this.initializeUi();
 
@@ -95,6 +96,8 @@ class PERT
 
         this.config.reset();
         this.currentProject = new Project(name, this.config.ns(name), this); // eslint-disable-line no-undef
+        this.currentStats = null;
+        this.currentProject.redrawStats();
     }
 
     deleteProject()
@@ -248,6 +251,21 @@ class PERT
                 this.currentProject.moveNode.node.style.top = `${this.currentProject.moveNode.config.top}px`;
                 this.currentProject.moveNode.node.style.left = `${this.currentProject.moveNode.config.left}px`;
                 this.currentProject.redrawEdges();
+            } else if (this.currentProject) {
+                let nodeId = null;
+                let element = e.srcElement;
+                do {
+                    if (element.classList.contains('node')) {
+                        nodeId = element.id;
+                        break;
+                    }
+                    element = element.parentElement;
+                } while (element);
+
+                if (nodeId !== this.currentStats) {
+                    this.currentStats = nodeId;
+                    this.currentProject.redrawStats(nodeId);
+                }
             }
         });
 

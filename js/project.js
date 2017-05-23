@@ -595,7 +595,75 @@ class Project
         });
     }
 
-        /**
+    /**
+     * @param {String} date
+     * @returns {Object}
+     */
+    costUntil(date)
+    {
+        const resourcesSpent = {};
+        const resources = this.config.get('resources');
+        for (const resourceId in resources) {
+            resourcesSpent[resourceId] = {name: resources[resourceId].name, value: 0};
+        }
+
+        const nodes = this.config.get('nodes');
+        for (const nodeId in nodes) {
+            if (nodes[nodeId].from > date) {
+                continue;
+            }
+            for (const resourceId in nodes[nodeId].resources) {
+                resourcesSpent[resourceId].value += nodes[nodeId].resources[resourceId];
+            }
+        }
+        return resourcesSpent;
+    }
+
+    /**
+     * @param {String} nodeId
+     * @returns {Object}
+     */
+    costUpTo(nodeId)
+    {
+        const resourcesSpent = {};
+        const resources = this.config.get('resources');
+        for (const resourceId in resources) {
+            resourcesSpent[resourceId] = {name: resources[resourceId].name, value: 0};
+        }
+
+        const nodes = this.config.get('nodes');
+        const nodeList = this.getNeighbours(nodeId, true, true).concat(nodeId);
+        for (const nodeId of nodeList) {
+            for (const resourceId in nodes[nodeId].resources) {
+                resourcesSpent[resourceId].value += nodes[nodeId].resources[resourceId];
+            }
+        }
+        return resourcesSpent;
+    }
+
+    /**
+     * @param {String} [nodeId]
+     */
+    redrawStats(nodeId)
+    {
+        const stats = nodeId ? this.costUpTo(nodeId) : this.costUntil(this.config.get('end'));
+        const statArea = this.ui('menu-contents-project').querySelector('.project-stats');
+
+        statArea.innerHTML = '';
+        for (const key in stats) {
+            const row = document.createElement('tr');
+            [stats[key].name, stats[key].value]
+                .map(value => {
+                    const td = document.createElement('td');
+                    td.innerText = value;
+                    return td;
+                })
+                .forEach(td => row.appendChild(td));
+            statArea.appendChild(row);
+        }
+    }
+
+    /**
      * @param {String} id
      */
     updateNode(id)
