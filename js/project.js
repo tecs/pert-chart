@@ -613,7 +613,7 @@ class Project
             row.appendChild(cell2);
 
             input.addEventListener('change', e => {
-                nodeResources[resourceId] = e.target.value = Math.max(0, parseFloat(e.target.value) || 0);
+                nodeResources[resourceId] = e.target.value = parseFloat(e.target.value) || 0;
                 cell1.className = cell2.className = (e.target.value === '0' ? 'empty' : '');
                 this.recaculateResourceConstraints();
             });
