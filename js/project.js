@@ -518,6 +518,9 @@ class Project
             nodeElement.classList.remove('red');
 
             for (const resourceId in node.resources) {
+                if (!(resourceId in resources)) {
+                    continue;
+                }
                 resourcesLeft[resourceId] -= node.resources[resourceId];
                 const index = Object.keys(node.resources).indexOf(resourceId) * 2;
                 if (node.resources[resourceId] && resourcesLeft[resourceId] < 0) {
