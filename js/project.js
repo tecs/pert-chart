@@ -291,6 +291,35 @@ class Project
     }
 
     /**
+     * @param {String} nodeId
+     * @param {Boolean} [backwards=false]
+     * @param {Boolean} [recursive=false]
+     * @returns {String[]}
+     */
+    getNeighbours(nodeId, backwards, recursive)
+    {
+        const edges = this.config.get('edges');
+        const neighbours = [];
+        for (const edgeId in edges) {
+            if (backwards && edges[edgeId].to === nodeId) {
+                neighbours.push(edges[edgeId].from);
+            } else if (!backwards && edges[edgeId].from === nodeId) {
+                neighbours.push(edges[edgeId].to);
+            }
+        }
+        if (recursive) {
+            return Array.from(
+                new Set(
+                    neighbours.concat(
+                        ...neighbours.map(neighbour => this.getNeighbours(neighbour, backwards, recursive))
+                    )
+                )
+            );
+        }
+        return neighbours;
+    }
+
+    /**
      * @param {Number} x1
      * @param {Number} y1
      * @param {Number} x2
@@ -446,14 +475,7 @@ class Project
             }
         }
         const updateConstraints = (nodeId, backwards, limit) => {
-            const neighbours = [];
-            for (const edgeId in edges) {
-                if (backwards && edges[edgeId].to === nodeId) {
-                    neighbours.push(edges[edgeId].from);
-                } else if (!backwards && edges[edgeId].from === nodeId) {
-                    neighbours.push(edges[edgeId].to);
-                }
-            }
+            const neighbours = this.getNeighbours(nodeId, backwards);
             const inputs = nodeInputs[nodeId];
             const node = nodes[nodeId];
             if (backwards) {
