@@ -8,5 +8,21 @@ const PERT = { // eslint-disable-line no-unused-vars
     {
         const multiplier = Math.pow(10, typeof precision === 'number' ? -precision : 0);
         return multiplier * Math.round(number / multiplier);
-    }
+    },
+
+
+    /**
+     * @param {String} name
+     * @returns {HTMLElement}
+     */
+    ui: (() =>
+    {
+        const cache = {};
+        return name => {
+            if (!(name in cache)) {
+                cache[name] = document.getElementById(name);
+            }
+            return cache[name];
+        };
+    })()
 };

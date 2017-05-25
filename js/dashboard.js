@@ -22,21 +22,9 @@ PERT.Dashboard = class Dashboard
         }
     }
 
-    /**
-     * @param {String} name
-     * @returns {HTMLElement}
-     */
-    ui(name)
-    {
-        if (!(name in this.uiCache)) {
-            this.uiCache[name] = document.getElementById(name);
-        }
-        return this.uiCache[name];
-    }
-
     redrawProjectsSelector()
     {
-        const select = this.ui('menu-contents-projects');
+        const select = PERT.ui('menu-contents-projects');
         select.innerHTML = '<option disabled selected>Load a project</option>';
         for (const project of this.config.keys()) {
             const option = document.createElement('option');
@@ -79,8 +67,8 @@ PERT.Dashboard = class Dashboard
      */
     loadProject(name)
     {
-        if (this.ui('menu-contents-projects').value !== name) {
-            this.ui('menu-contents-projects').value = name;
+        if (PERT.ui('menu-contents-projects').value !== name) {
+            PERT.ui('menu-contents-projects').value = name;
         }
 
         this.config.reset();
@@ -125,11 +113,11 @@ PERT.Dashboard = class Dashboard
 
     initializeUi()
     {
-        this.ui('menu-collapse').onclick = () => this.ui('menu').classList.toggle('menu-collapsed');
+        PERT.ui('menu-collapse').onclick = () => PERT.ui('menu').classList.toggle('menu-collapsed');
 
         this.redrawProjectsSelector();
 
-        this.ui('menu-contents-new').addEventListener('click', () => {
+        PERT.ui('menu-contents-new').addEventListener('click', () => {
             const newName = this.getNewProjectName();
 
             if (newName !== null) {
@@ -138,7 +126,7 @@ PERT.Dashboard = class Dashboard
             }
         });
 
-        this.ui('menu-contents-import').addEventListener('click', () => {
+        PERT.ui('menu-contents-import').addEventListener('click', () => {
             const newName = this.getNewProjectName();
 
             if (newName !== null) {
@@ -164,7 +152,7 @@ PERT.Dashboard = class Dashboard
             }
         });
 
-        this.ui('menu-contents-rename').addEventListener('click', () => {
+        PERT.ui('menu-contents-rename').addEventListener('click', () => {
             const newName = this.getNewProjectName(true);
 
             if (newName !== null) {
@@ -177,15 +165,15 @@ PERT.Dashboard = class Dashboard
             }
         });
 
-        this.ui('menu-contents-delete').addEventListener('click', () => {
+        PERT.ui('menu-contents-delete').addEventListener('click', () => {
             if (confirm('Are you sure you want to delete the current project? This action cannot be undone.')) {
                 this.deleteProject(name);
             }
         });
 
-        this.ui('menu-contents-save').addEventListener('click', () => this.currentProject.save());
+        PERT.ui('menu-contents-save').addEventListener('click', () => this.currentProject.save());
 
-        this.ui('menu-contents-export').addEventListener('click', () => {
+        PERT.ui('menu-contents-export').addEventListener('click', () => {
             const json = JSON.stringify(this.currentProject.originalConfig);
             const blob = new Blob([json], {type: 'application/json'});
             const reader = new FileReader();
@@ -198,7 +186,7 @@ PERT.Dashboard = class Dashboard
             reader.readAsDataURL(blob);
         });
 
-        this.ui('menu-contents-add-node').addEventListener('click', () => {
+        PERT.ui('menu-contents-add-node').addEventListener('click', () => {
             let newName, promptText = '';
             for (;;) {
                 promptText += 'Please enter a name for the new milestone:';
@@ -214,7 +202,7 @@ PERT.Dashboard = class Dashboard
             this.currentProject.addNode(newName);
         });
 
-        this.ui('menu-contents-projects').addEventListener('change', e => {
+        PERT.ui('menu-contents-projects').addEventListener('change', e => {
             if (this.shouldStayOnPage()) {
                 return;
             }

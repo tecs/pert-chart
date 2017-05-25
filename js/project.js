@@ -25,13 +25,13 @@ PERT.Project = class Project
             });
         }
 
-        this.ui('area').innerHTML = '';
-        this.ui('menu-contents').classList.add('menu-contents-project-loaded');
+        PERT.ui('area').innerHTML = '';
+        PERT.ui('menu-contents').classList.add('menu-contents-project-loaded');
 
         const configData = this.configData;
-        const projectMenu = this.ui('menu-contents-project');
+        const projectMenu = PERT.ui('menu-contents-project');
 
-        const template = this.ui('templates').import.getElementById('ProjectTemplate').content;
+        const template = PERT.ui('templates').import.getElementById('ProjectTemplate').content;
         const project = document.importNode(template, true).firstElementChild;
 
         projectMenu.innerHTML = '';
@@ -140,7 +140,7 @@ PERT.Project = class Project
      */
     drawNode(id)
     {
-        const template = this.ui('templates').import.getElementById('NodeTemplate').content;
+        const template = PERT.ui('templates').import.getElementById('NodeTemplate').content;
         const node = document.importNode(template, true).firstElementChild;
         const config = this.config.ns('nodes').get(id);
         node.id = id;
@@ -167,7 +167,7 @@ PERT.Project = class Project
         dates[0].value = config.start;
         dates[1].value = config.end;
 
-        this.ui('area').appendChild(node);
+        PERT.ui('area').appendChild(node);
 
         this.updateNode(id);
 
@@ -259,7 +259,7 @@ PERT.Project = class Project
                 edge.classList.add('edge-moving');
                 if (!node.newedge) {
                     node.newedge = edge;
-                    this.ui('area').appendChild(edge);
+                    PERT.ui('area').appendChild(edge);
                 }
             };
         });
@@ -268,7 +268,7 @@ PERT.Project = class Project
             e.dataTransfer.clearData();
             window.requestAnimationFrame(() => {
                 if (!this.config.ns('edges').has(node.newedge.id)) {
-                    this.ui('area').removeChild(node.newedge);
+                    PERT.ui('area').removeChild(node.newedge);
                 }
                 node.newedge.classList.remove('edge-moving');
                 delete node.newedge;
@@ -365,7 +365,7 @@ PERT.Project = class Project
             edge.classList.remove('critical');
         }
         if (!edge.parentNode) {
-            this.ui('area').appendChild(edge);
+            PERT.ui('area').appendChild(edge);
         }
     }
 
@@ -408,7 +408,7 @@ PERT.Project = class Project
         }
 
         resource.className = 'menu-contents-project-resource';
-        this.ui('menu-contents-project').querySelector('.project-resources').appendChild(resource);
+        PERT.ui('menu-contents-project').querySelector('.project-resources').appendChild(resource);
     }
 
     /**
@@ -444,7 +444,7 @@ PERT.Project = class Project
     {
         const nodes = this.config.get('nodes');
         const edges = this.config.get('edges');
-        const nodeInputs = {project: this.ui('menu-contents-project').querySelectorAll('.project-dates input')};
+        const nodeInputs = {project: PERT.ui('menu-contents-project').querySelectorAll('.project-dates input')};
         nodeInputs.project[0].min = '';
         nodeInputs.project[0].max = '';
         nodeInputs.project[1].min = '';
@@ -647,7 +647,7 @@ PERT.Project = class Project
     redrawStats(nodeId)
     {
         const stats = nodeId ? this.costUpTo(nodeId) : this.costUntil(this.config.get('end'));
-        const statArea = this.ui('menu-contents-project').querySelector('.project-stats');
+        const statArea = PERT.ui('menu-contents-project').querySelector('.project-stats');
 
         statArea.innerHTML = '';
         for (const key in stats) {
