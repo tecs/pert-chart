@@ -80,15 +80,6 @@ PERT.Project = class Project
         return this.config.getPointers()[0];
     }
 
-    /**
-     * @param {String} name
-     * @returns {HTMLElement}
-     */
-    ui(name)
-    {
-        return this.pert.ui(name);
-    }
-
     save()
     {
         this.config.get('stats').modifiedAt = Date.now();
