@@ -1,4 +1,4 @@
-class Project
+PERT.Project = class Project
 {
     /**
      * @param {String} name
@@ -720,4 +720,4 @@ class Project
             this.updateNode(id);
         }
     }
-}
+};
