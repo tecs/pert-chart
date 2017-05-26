@@ -23,7 +23,9 @@ PERT.Project = class Project
             });
         }
 
-        PERT.ui('area').innerHTML = '';
+        PERT.currentStats = null;
+
+        PERT.ui('area').innerHTML = '<div class="project-area"></div>';
         PERT.ui('menu-contents').classList.add('menu-contents-project-loaded');
 
         const configData = this.configData;
@@ -109,6 +111,53 @@ PERT.Project = class Project
                 }
             }
             this.addNode(newName);
+        });
+
+        const projectArea = PERT.ui('area').querySelector('.project-area');
+
+        projectArea.addEventListener('mousemove', e => {
+            if (this.moveNode) {
+                this.moveNode.config.top = PERT.round(
+                    Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0),
+                    -1
+                );
+                this.moveNode.config.left = PERT.round(
+                    Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0),
+                    -1
+                );
+                this.moveNode.node.style.top = `${this.moveNode.config.top}px`;
+                this.moveNode.node.style.left = `${this.moveNode.config.left}px`;
+                this.redrawEdges();
+            } else {
+                let nodeId = null;
+                let element = e.srcElement;
+                do {
+                    if (element.classList.contains('node')) {
+                        nodeId = element.id;
+                        break;
+                    }
+                    element = element.parentElement;
+                } while (element);
+
+                if (nodeId !== PERT.currentStats) {
+                    PERT.currentStats = nodeId;
+                    this.redrawStats(nodeId);
+                }
+            }
+        });
+
+        projectArea.addEventListener('mouseout', e => {
+            if (e.fromElement.tagName === 'HTML') {
+                this.moveNode = null;
+            }
+        });
+
+        projectArea.addEventListener('mouseup', () => this.moveNode = null);
+
+        projectArea.addEventListener('drag', e => {
+            if (e.target.redrawEdge) {
+                e.target.redrawEdge(e.pageX, e.pageY);
+            }
         });
     }
 
@@ -206,7 +255,7 @@ PERT.Project = class Project
         dates[0].value = config.start;
         dates[1].value = config.end;
 
-        PERT.ui('area').appendChild(node);
+        PERT.ui('area').querySelector('.project-area').appendChild(node);
 
         this.updateNode(id);
 
@@ -298,7 +347,7 @@ PERT.Project = class Project
                 edge.classList.add('edge-moving');
                 if (!node.newedge) {
                     node.newedge = edge;
-                    PERT.ui('area').appendChild(edge);
+                    PERT.ui('area').querySelector('.project-area').appendChild(edge);
                 }
             };
         });
@@ -307,7 +356,7 @@ PERT.Project = class Project
             e.dataTransfer.clearData();
             window.requestAnimationFrame(() => {
                 if (!this.config.ns('edges').has(node.newedge.id)) {
-                    PERT.ui('area').removeChild(node.newedge);
+                    node.newedge.parentNode.removeChild(node.newedge);
                 }
                 node.newedge.classList.remove('edge-moving');
                 delete node.newedge;
@@ -404,7 +453,7 @@ PERT.Project = class Project
             edge.classList.remove('critical');
         }
         if (!edge.parentNode) {
-            PERT.ui('area').appendChild(edge);
+            PERT.ui('area').querySelector('.project-area').appendChild(edge);
         }
     }
 

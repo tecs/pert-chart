@@ -27,7 +27,9 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 #area { position: absolute; z-index: 1; }
 
-.node { background: #FFF; position: absolute; width: 300px; height: 120px; box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); z-index: 2; }
+#area .project-area { position: fixed; top: 0; width: 100%; height: 100%; z-index: 1; overflow: auto; }
+
+.node { background: #FFF; position: absolute; width: 300px; height: 120px; box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5); z-index: 3; }
 
 .node > * { position: absolute; }
 
@@ -57,7 +59,7 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 .node .node-dates input:last-child { float: right; }
 
-.node:hover { z-index: 3; }
+.node:hover { z-index: 4; }
 
 .node:hover .empty { display: block; }
 
@@ -73,9 +75,9 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 .node.red.critical { box-shadow: 0 0 7px 1px rgba(255, 0, 0, 0.7); }
 
-.edge { position: absolute; background: black; height: 1px; transform-origin: top left; opacity: 0.4; z-index: 1; }
+.edge { position: absolute; background: black; height: 1px; transform-origin: top left; opacity: 0.4; z-index: 2; }
 
-.edge.edge-moving { z-index: 4; opacity: 1; }
+.edge.edge-moving { z-index: 5; opacity: 1; }
 
 .edge.critical { height: 2px; opacity: 1; }
 

@@ -51,7 +51,6 @@ PERT.Dashboard = class Dashboard
 
         PERT.config.reset();
         PERT.currentProject = new PERT.Project(name, PERT.config.ns(name));
-        PERT.currentStats = null;
         PERT.currentProject.redrawStats();
     }
 
@@ -135,56 +134,6 @@ PERT.Dashboard = class Dashboard
                 return;
             }
             Dashboard.loadProject(e.target.options[e.target.selectedIndex].value);
-        });
-
-        document.body.addEventListener('mousemove', e => {
-            if (PERT.currentProject && PERT.currentProject.moveNode) {
-                PERT.currentProject.moveNode.config.top = PERT.round(
-                    Math.max(
-                        PERT.currentProject.moveNode.originalTop + e.clientY - PERT.currentProject.moveNode.top,
-                        0
-                    ),
-                    -1
-                );
-                PERT.currentProject.moveNode.config.left = PERT.round(
-                    Math.max(
-                        PERT.currentProject.moveNode.originalLeft + e.clientX - PERT.currentProject.moveNode.left,
-                        0
-                    ),
-                    -1
-                );
-                PERT.currentProject.moveNode.node.style.top = `${PERT.currentProject.moveNode.config.top}px`;
-                PERT.currentProject.moveNode.node.style.left = `${PERT.currentProject.moveNode.config.left}px`;
-                PERT.currentProject.redrawEdges();
-            } else if (PERT.currentProject) {
-                let nodeId = null;
-                let element = e.srcElement;
-                do {
-                    if (element.classList.contains('node')) {
-                        nodeId = element.id;
-                        break;
-                    }
-                    element = element.parentElement;
-                } while (element);
-
-                if (nodeId !== PERT.currentStats) {
-                    PERT.currentStats = nodeId;
-                    PERT.currentProject.redrawStats(nodeId);
-                }
-            }
-        });
-
-        document.documentElement.addEventListener('mouseout', e => {
-            if (e.fromElement.tagName === 'HTML') {
-                PERT.currentProject.moveNode = null;
-            }
-        });
-        document.body.addEventListener('mouseup', () => PERT.currentProject.moveNode = null);
-
-        document.body.addEventListener('drag', e => {
-            if (e.target.redrawEdge) {
-                e.target.redrawEdge(e.pageX, e.pageY);
-            }
         });
 
         window.addEventListener('beforeunload', e => {

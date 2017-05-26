@@ -92,6 +92,15 @@ html, body {
 #area {
     position: absolute;
     z-index: 1;
+
+    .project-area {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: auto;
+    }
 }
 
 .node {
@@ -100,7 +109,7 @@ html, body {
     width: $node-width;
     height: $node-height;
     box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-    z-index: 2;
+    z-index: 3;
 
     > * {
         position: absolute;
@@ -217,7 +226,7 @@ html, body {
     }
 
     &:hover {
-        z-index: 3;
+        z-index: 4;
 
         .empty {
             display: block;
@@ -257,10 +266,10 @@ html, body {
     height: 1px;
     transform-origin: top left;
     opacity: 0.4;
-    z-index: 1;
+    z-index: 2;
 
     &.edge-moving {
-        z-index: 4;
+        z-index: 5;
         opacity: 1;
     }
 
