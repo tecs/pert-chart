@@ -130,25 +130,6 @@ PERT.Dashboard = class Dashboard
             }
         });
 
-        PERT.ui('menu-contents-rename').addEventListener('click', () => {
-            const newName = Dashboard.getNewProjectName(true);
-
-            if (newName !== null) {
-                PERT.config.reset();
-                PERT.config.set(newName, PERT.currentProject.configData);
-                PERT.config.unset(PERT.currentProject.name);
-                PERT.config.commit();
-                Dashboard.redrawProjectsSelector();
-                Dashboard.loadProject(newName);
-            }
-        });
-
-        PERT.ui('menu-contents-delete').addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete the current project? This action cannot be undone.')) {
-                Dashboard.deleteProject(name);
-            }
-        });
-
         PERT.ui('menu-contents-projects').addEventListener('change', e => {
             if (Dashboard.shouldStayOnPage()) {
                 return;

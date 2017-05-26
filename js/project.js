@@ -61,7 +61,6 @@ PERT.Project = class Project
         this.configData.stats.accessedAt = Date.now();
         this.save();
 
-
         project.querySelector('.project-save').addEventListener('click', () => this.save());
 
         project.querySelector('.project-export').addEventListener('click', () => {
@@ -75,6 +74,25 @@ PERT.Project = class Project
                 link.click();
             });
             reader.readAsDataURL(blob);
+        });
+
+        project.querySelector('.project-rename').addEventListener('click', () => {
+            const newName = PERT.Dashboard.getNewProjectName(true);
+
+            if (newName !== null) {
+                PERT.config.reset();
+                PERT.config.set(newName, configData);
+                PERT.config.unset(this.name);
+                PERT.config.commit();
+                PERT.Dashboard.redrawProjectsSelector();
+                PERT.Dashboard.loadProject(newName);
+            }
+        });
+
+        project.querySelector('.project-delete').addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete the current project? This action cannot be undone.')) {
+                PERT.Dashboard.deleteProject(name);
+            }
         });
 
         project.querySelector('.prorect-add-node').addEventListener('click', () => {
