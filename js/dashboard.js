@@ -2,7 +2,6 @@ PERT.Dashboard = class Dashboard
 {
     constructor()
     {
-        this.config = new DataStore('pert');
         this.currentProject = null;
         this.currentStats = null;
 
@@ -10,8 +9,8 @@ PERT.Dashboard = class Dashboard
 
         // Load the last opened project
         const projects = [];
-        for (const name of this.config.keys()) {
-            const accessedAt = this.config.get(name).stats.accessedAt;
+        for (const name of PERT.config.keys()) {
+            const accessedAt = PERT.config.get(name).stats.accessedAt;
             projects.push({name, accessedAt});
         }
         projects.sort((a, b) => b.accessedAt - a.accessedAt);
@@ -21,11 +20,11 @@ PERT.Dashboard = class Dashboard
         }
     }
 
-    redrawProjectsSelector()
+    static redrawProjectsSelector()
     {
         const select = PERT.ui('menu-contents-projects');
         select.innerHTML = '<option disabled selected>Load a project</option>';
-        for (const project of this.config.keys()) {
+        for (const project of PERT.config.keys()) {
             const option = document.createElement('option');
             option.innerText = project;
             option.value = project;
@@ -38,13 +37,13 @@ PERT.Dashboard = class Dashboard
      * @param {Boolean} [returnMessage]
      * @returns {Boolean|String}
      */
-    shouldStayOnPage(action, returnMessage)
+    static shouldStayOnPage(action, returnMessage)
     {
         let message = 'The current project has unsaved changes which will be lost if you continue.';
         if (typeof action === 'string') {
             message += ` ${action}`;
         }
-        if (this.config.changed()) {
+        if (PERT.config.changed()) {
             return returnMessage ? message : !confirm(message);
         }
         return false;
@@ -53,12 +52,12 @@ PERT.Dashboard = class Dashboard
     /**
      * @param {String} name
      */
-    createProject(name)
+    static createProject(name)
     {
-        this.config.reset();
-        this.config.set(name, {});
-        this.config.commit();
-        this.redrawProjectsSelector();
+        PERT.config.reset();
+        PERT.config.set(name, {});
+        PERT.config.commit();
+        Dashboard.redrawProjectsSelector();
     }
 
     /**
@@ -70,16 +69,16 @@ PERT.Dashboard = class Dashboard
             PERT.ui('menu-contents-projects').value = name;
         }
 
-        this.config.reset();
-        this.currentProject = new PERT.Project(name, this.config.ns(name));
+        PERT.config.reset();
+        this.currentProject = new PERT.Project(name, PERT.config.ns(name));
         this.currentStats = null;
         this.currentProject.redrawStats();
     }
 
     deleteProject()
     {
-        this.config.unset(this.currentProject.name);
-        this.config.commit();
+        PERT.config.unset(this.currentProject.name);
+        PERT.config.commit();
         window.location.reload();
     }
 
@@ -89,12 +88,12 @@ PERT.Dashboard = class Dashboard
      */
     getNewProjectName(rename)
     {
-        if (this.shouldStayOnPage()) {
+        if (Dashboard.shouldStayOnPage()) {
             return null;
         }
 
         let promptText = '';
-        let newName = rename ? this.currentProject.name : this.config.findFreeKey('Untitled Project ');
+        let newName = rename ? this.currentProject.name : PERT.config.findFreeKey('Untitled Project ');
         for (;;) {
             promptText += `Please enter a ${rename ? 'new name for the' : 'name for the new'} project:`;
             newName = prompt(promptText, newName);
@@ -102,7 +101,7 @@ PERT.Dashboard = class Dashboard
                 return null;
             } else if (newName === '') {
                 promptText = 'The project name cannot be empty.\n';
-            } else if (this.config.has(newName)) {
+            } else if (PERT.config.has(newName)) {
                 promptText = 'A project with the selected name already exists.\n';
             } else {
                 return newName;
@@ -114,13 +113,13 @@ PERT.Dashboard = class Dashboard
     {
         PERT.ui('menu-collapse').onclick = () => PERT.ui('menu').classList.toggle('menu-collapsed');
 
-        this.redrawProjectsSelector();
+        Dashboard.redrawProjectsSelector();
 
         PERT.ui('menu-contents-new').addEventListener('click', () => {
             const newName = this.getNewProjectName();
 
             if (newName !== null) {
-                this.createProject(newName);
+                Dashboard.createProject(newName);
                 this.loadProject(newName);
             }
         });
@@ -136,10 +135,10 @@ PERT.Dashboard = class Dashboard
                     const reader = new FileReader();
 
                     reader.addEventListener('load', () => {
-                        this.config.reset();
-                        this.config.set(newName, JSON.parse(reader.result));
-                        this.config.commit();
-                        this.redrawProjectsSelector();
+                        PERT.config.reset();
+                        PERT.config.set(newName, JSON.parse(reader.result));
+                        PERT.config.commit();
+                        Dashboard.redrawProjectsSelector();
                         this.loadProject(newName);
                     }, false);
 
@@ -155,11 +154,11 @@ PERT.Dashboard = class Dashboard
             const newName = this.getNewProjectName(true);
 
             if (newName !== null) {
-                this.config.reset();
-                this.config.set(newName, this.currentProject.configData);
-                this.config.unset(this.currentProject.name);
-                this.config.commit();
-                this.redrawProjectsSelector();
+                PERT.config.reset();
+                PERT.config.set(newName, this.currentProject.configData);
+                PERT.config.unset(this.currentProject.name);
+                PERT.config.commit();
+                Dashboard.redrawProjectsSelector();
                 this.loadProject(newName);
             }
         });
@@ -173,7 +172,7 @@ PERT.Dashboard = class Dashboard
         PERT.ui('menu-contents-save').addEventListener('click', () => this.currentProject.save());
 
         PERT.ui('menu-contents-projects').addEventListener('change', e => {
-            if (this.shouldStayOnPage()) {
+            if (Dashboard.shouldStayOnPage()) {
                 return;
             }
             this.loadProject(e.target.options[e.target.selectedIndex].value);
@@ -230,7 +229,7 @@ PERT.Dashboard = class Dashboard
         });
 
         window.addEventListener('beforeunload', e => {
-            const message = this.shouldStayOnPage(null, true);
+            const message = Dashboard.shouldStayOnPage(null, true);
             if (message) {
                 e.preventDefault();
                 return e.returnValue = message;

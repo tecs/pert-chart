@@ -1,4 +1,6 @@
 const PERT = { // eslint-disable-line no-unused-vars
+    config: new DataStore('pert'),
+
     /**
      * @param {Number} number
      * @param {Number} [precision=0]
