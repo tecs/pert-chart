@@ -169,8 +169,6 @@ PERT.Dashboard = class Dashboard
             }
         });
 
-        PERT.ui('menu-contents-save').addEventListener('click', () => this.currentProject.save());
-
         PERT.ui('menu-contents-projects').addEventListener('change', e => {
             if (Dashboard.shouldStayOnPage()) {
                 return;

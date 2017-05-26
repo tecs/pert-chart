@@ -61,6 +61,9 @@ PERT.Project = class Project
         this.configData.stats.accessedAt = Date.now();
         this.save();
 
+
+        project.querySelector('.project-save').addEventListener('click', () => this.save());
+
         project.querySelector('.project-export').addEventListener('click', () => {
             const json = JSON.stringify(this.originalConfig);
             const blob = new Blob([json], {type: 'application/json'});
