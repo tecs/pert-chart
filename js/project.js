@@ -23,8 +23,6 @@ PERT.Project = class Project
             });
         }
 
-        PERT.currentStats = null;
-
         PERT.ui('area').innerHTML = '<div class="project-area"></div>';
         PERT.ui('menu-contents').classList.add('menu-contents-project-loaded');
 
@@ -159,6 +157,9 @@ PERT.Project = class Project
                 e.target.redrawEdge(e.pageX, e.pageY);
             }
         });
+
+        PERT.currentStats = null;
+        this.redrawStats();
     }
 
     /**
