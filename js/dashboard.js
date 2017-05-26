@@ -1,22 +1,5 @@
 PERT.Dashboard = class Dashboard
 {
-    constructor()
-    {
-        Dashboard.initializeUi();
-
-        // Load the last opened project
-        const projects = [];
-        for (const name of PERT.config.keys()) {
-            const accessedAt = PERT.config.get(name).stats.accessedAt;
-            projects.push({name, accessedAt});
-        }
-        projects.sort((a, b) => b.accessedAt - a.accessedAt);
-        for (const project of projects) {
-            Dashboard.loadProject(project.name);
-            break;
-        }
-    }
-
     static redrawProjectsSelector()
     {
         const select = PERT.ui('menu-contents-projects');
@@ -230,7 +213,19 @@ PERT.Dashboard = class Dashboard
                 return e.returnValue = message;
             }
         });
+
+        // Load the last opened project
+        const projects = [];
+        for (const name of PERT.config.keys()) {
+            const accessedAt = PERT.config.get(name).stats.accessedAt;
+            projects.push({name, accessedAt});
+        }
+        projects.sort((a, b) => b.accessedAt - a.accessedAt);
+        for (const project of projects) {
+            Dashboard.loadProject(project.name);
+            break;
+        }
     }
 };
 
-window.onload = () => new PERT.Dashboard();
+window.onload = () => PERT.Dashboard.initializeUi();
