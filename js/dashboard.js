@@ -173,35 +173,6 @@ PERT.Dashboard = class Dashboard
 
         PERT.ui('menu-contents-save').addEventListener('click', () => this.currentProject.save());
 
-        PERT.ui('menu-contents-export').addEventListener('click', () => {
-            const json = JSON.stringify(this.currentProject.originalConfig);
-            const blob = new Blob([json], {type: 'application/json'});
-            const reader = new FileReader();
-            reader.addEventListener('load', e => {
-                const link = document.createElement('a');
-                link.download = `${this.currentProject.name}.pert`;
-                link.href = e.target.result;
-                link.click();
-            });
-            reader.readAsDataURL(blob);
-        });
-
-        PERT.ui('menu-contents-add-node').addEventListener('click', () => {
-            let newName, promptText = '';
-            for (;;) {
-                promptText += 'Please enter a name for the new milestone:';
-                newName = prompt(promptText, newName);
-                if (newName === null) {
-                    return;
-                } else if (newName === '') {
-                    promptText = 'The new milestone name cannot be empty.\n';
-                } else {
-                    break;
-                }
-            }
-            this.currentProject.addNode(newName);
-        });
-
         PERT.ui('menu-contents-projects').addEventListener('change', e => {
             if (this.shouldStayOnPage()) {
                 return;

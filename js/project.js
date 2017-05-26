@@ -60,6 +60,35 @@ PERT.Project = class Project
 
         this.configData.stats.accessedAt = Date.now();
         this.save();
+
+        project.querySelector('.project-export').addEventListener('click', () => {
+            const json = JSON.stringify(this.originalConfig);
+            const blob = new Blob([json], {type: 'application/json'});
+            const reader = new FileReader();
+            reader.addEventListener('load', e => {
+                const link = document.createElement('a');
+                link.download = `${this.name}.pert`;
+                link.href = e.target.result;
+                link.click();
+            });
+            reader.readAsDataURL(blob);
+        });
+
+        project.querySelector('.prorect-add-node').addEventListener('click', () => {
+            let newName, promptText = '';
+            for (;;) {
+                promptText += 'Please enter a name for the new milestone:';
+                newName = prompt(promptText, newName);
+                if (newName === null) {
+                    return;
+                } else if (newName === '') {
+                    promptText = 'The new milestone name cannot be empty.\n';
+                } else {
+                    break;
+                }
+            }
+            this.addNode(newName);
+        });
     }
 
     /**
