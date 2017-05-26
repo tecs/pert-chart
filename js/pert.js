@@ -15,8 +15,7 @@ const PERT = { // eslint-disable-line no-unused-vars
      * @param {String} name
      * @returns {HTMLElement}
      */
-    ui: (() =>
-    {
+    ui: (() => {
         const cache = {};
         return name => {
             if (!(name in cache)) {

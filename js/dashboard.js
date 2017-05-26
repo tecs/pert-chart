@@ -72,7 +72,7 @@ PERT.Dashboard = class Dashboard
         }
 
         this.config.reset();
-        this.currentProject = new PERT.Project(name, this.config.ns(name), this); // eslint-disable-line no-undef
+        this.currentProject = new PERT.Project(name, this.config.ns(name));
         this.currentStats = null;
         this.currentProject.redrawStats();
     }

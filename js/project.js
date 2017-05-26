@@ -3,13 +3,11 @@ PERT.Project = class Project
     /**
      * @param {String} name
      * @param {DataStore} config
-     * @param {PERT} pert
      */
-    constructor(name, config, pert)
+    constructor(name, config)
     {
         this.name = name;
         this.config = config;
-        this.pert = pert;
         if (!this.config.has('stats')) {
             Object.assign(this.configData, {
                 resources: {},
