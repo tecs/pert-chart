@@ -8,7 +8,7 @@ PERT.Project = class Project
     {
         this.name = name;
         this.config = config;
-        if (!this.config.has('stats')) {
+        if (!this.config.keys().length) {
             Object.assign(this.configData, {
                 resources: {},
                 nodes: {},
