@@ -120,14 +120,6 @@ PERT.Project = class Project
         return this.config.getData();
     }
 
-    /**
-     * @returns {Object}
-     */
-    get originalConfig()
-    {
-        return this.config.getPointers()[0];
-    }
-
     save()
     {
         this.config.get('stats').modifiedAt = Date.now();
@@ -157,7 +149,7 @@ PERT.Project = class Project
 
     export()
     {
-        const json = JSON.stringify(this.originalConfig);
+        const json = JSON.stringify(this.configData);
         const blob = new Blob([json], {type: 'application/json'});
         const reader = new FileReader();
         reader.addEventListener('load', e => {
