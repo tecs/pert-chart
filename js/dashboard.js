@@ -51,6 +51,7 @@ PERT.Dashboard = class Dashboard
 
         PERT.config.reset();
         PERT.currentProject = new PERT.Project(name, PERT.config.ns(name));
+        PERT.currentProject.drawNodes(); // TODO: Find a better way to do this.
     }
 
     static deleteProject()

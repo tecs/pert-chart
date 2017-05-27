@@ -52,12 +52,6 @@ PERT.Project = class Project
         }
         this.createResourceInputs();
 
-        for (const id in configData.nodes) {
-            this.drawNode(id);
-        }
-        this.recalculateDateConstraints();
-        this.redrawEdges();
-
         this.configData.stats.accessedAt = Date.now();
         this.save();
 
@@ -204,6 +198,16 @@ PERT.Project = class Project
 
         this.drawNode(id);
         this.recalculateDateConstraints();
+    }
+
+    drawNodes()
+    {
+        const nodes = this.config.ns('nodes');
+        for (const id of nodes.keys()) {
+            this.drawNode(id);
+        }
+        this.recalculateDateConstraints();
+        this.redrawEdges();
     }
 
     /**
