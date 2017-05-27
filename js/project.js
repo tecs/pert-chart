@@ -62,38 +62,9 @@ PERT.Project = class Project
         this.save();
 
         project.querySelector('.project-save').addEventListener('click', () => this.save());
-
-        project.querySelector('.project-export').addEventListener('click', () => {
-            const json = JSON.stringify(this.originalConfig);
-            const blob = new Blob([json], {type: 'application/json'});
-            const reader = new FileReader();
-            reader.addEventListener('load', e => {
-                const link = document.createElement('a');
-                link.download = `${this.name}.pert`;
-                link.href = e.target.result;
-                link.click();
-            });
-            reader.readAsDataURL(blob);
-        });
-
-        project.querySelector('.project-rename').addEventListener('click', () => {
-            const newName = PERT.Dashboard.getNewProjectName(true);
-
-            if (newName !== null) {
-                PERT.config.reset();
-                PERT.config.set(newName, configData);
-                PERT.config.unset(this.name);
-                PERT.config.commit();
-                PERT.Dashboard.redrawProjectsSelector();
-                PERT.Dashboard.loadProject(newName);
-            }
-        });
-
-        project.querySelector('.project-delete').addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete the current project? This action cannot be undone.')) {
-                PERT.Dashboard.deleteProject(name);
-            }
-        });
+        project.querySelector('.project-export').addEventListener('click', () => this.export());
+        project.querySelector('.project-rename').addEventListener('click', () => this.rename());
+        project.querySelector('.project-delete').addEventListener('click', () => this.delete());
 
         project.querySelector('.prorect-add-node').addEventListener('click', () => {
             let newName, promptText = '';
@@ -182,6 +153,41 @@ PERT.Project = class Project
     {
         this.config.get('stats').modifiedAt = Date.now();
         this.config.commit();
+    }
+
+    rename()
+    {
+        const newName = PERT.Dashboard.getNewProjectName(true);
+
+        if (newName !== null) {
+            PERT.config.reset();
+            PERT.config.set(newName, this.configData);
+            PERT.config.unset(this.name);
+            PERT.config.commit();
+            PERT.Dashboard.redrawProjectsSelector();
+            PERT.Dashboard.loadProject(newName);
+        }
+    }
+
+    delete()
+    {
+        if (confirm('Are you sure you want to delete the current project? This action cannot be undone.')) {
+            PERT.Dashboard.deleteProject(this.name);
+        }
+    }
+
+    export()
+    {
+        const json = JSON.stringify(this.originalConfig);
+        const blob = new Blob([json], {type: 'application/json'});
+        const reader = new FileReader();
+        reader.addEventListener('load', e => {
+            const link = document.createElement('a');
+            link.download = `${this.name}.pert`;
+            link.href = e.target.result;
+            link.click();
+        });
+        reader.readAsDataURL(blob);
     }
 
     /**
