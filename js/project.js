@@ -278,7 +278,7 @@ PERT.Project = class Project
         const left = [], right = [];
         for (const nodeId in this.nodes) {
             const node = this.nodes[nodeId];
-            Object.assign(node.dates[0], node.dates[1], {min: '', max: ''});
+            Object.assign(node.dateInputs[0], node.dateInputs[1], {min: '', max: ''});
             if (!node.getNeighbours(true).length) {
                 left.push(node);
             }
@@ -290,13 +290,13 @@ PERT.Project = class Project
         right.forEach(node => node.updateDateConstraints(true, project[1].value));
 
         left.forEach(node => {
-            const value = node.dates[0].value || node.dates[1].value || node.dates[1].max;
+            const value = node.dateInputs[0].value || node.dateInputs[1].value || node.dateInputs[1].max;
             if (!project[0].max || (value && project[0].max > value)) {
                 project[0].max = value;
             }
         });
         right.forEach(node => {
-            const value = node.dates[1].value || node.dates[0].value || node.dates[0].min;
+            const value = node.dateInputs[1].value || node.dateInputs[0].value || node.dateInputs[0].min;
             if (!project[1].min || (value && project[1].min < value)) {
                 project[1].min = value;
             }
@@ -321,10 +321,10 @@ PERT.Project = class Project
         }
         for (const nodeId of nodesOrdered) {
             const node = nodes[nodeId];
-            const nodeElement = document.getElementById(nodeId);
-            if (!nodeElement) {
+            if (!(nodeId in this.nodes)) {
                 continue;
             }
+            const nodeElement = this.nodes[nodeId].node;
             const resourceCells = nodeElement.querySelectorAll('.node-resources td');
 
             nodeElement.classList.remove('red');
@@ -345,7 +345,7 @@ PERT.Project = class Project
                 }
 
                 if (resources[resourceId].concurrency && node.resources[resourceId]) {
-                    const dates = nodeElement.querySelectorAll('.node-dates input');
+                    const dates = this.nodes[nodeId].dateInputs;
                     events.push({nodeId, resourceId, start: true, time: dates[0].value || dates[1].min});
                     events.push({nodeId, resourceId, start: false, time: dates[1].value || dates[0].max || 'z'});
                 }

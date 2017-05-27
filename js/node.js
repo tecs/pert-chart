@@ -40,35 +40,28 @@ PERT.Node = class Node
             node.classList.add('critical');
         }
 
-        const input = node.querySelector('.node-name');
         const deleteButton = node.querySelector('.node-delete');
         const drag = node.querySelector('.node-drag');
         const critical = node.querySelector('.node-critical');
         const edgeLink = node.querySelector('.node-edge');
-        this.dates = node.querySelectorAll('.node-dates input');
+        this.dateInputs = node.querySelectorAll('.node-dates input');
+        this.nameInput = node.querySelector('.node-name');
 
-        input.value = config.name;
+        this.nameInput.value = config.name;
         if (!config.start) {
-            this.dates[0].className = 'empty';
+            this.dateInputs[0].className = 'empty';
         }
         if (!config.end) {
-            this.dates[1].className = 'empty';
+            this.dateInputs[1].className = 'empty';
         }
-        this.dates[0].value = config.start;
-        this.dates[1].value = config.end;
+        this.dateInputs[0].value = config.start;
+        this.dateInputs[1].value = config.end;
 
         PERT.ui('area').querySelector('.project-area').appendChild(node);
 
         this.update();
 
-        input.addEventListener('change', e => {
-            if (e.target.value === '') {
-                alert('Milestone name cannot be empty.');
-                e.target.value = config.name;
-            } else {
-                config.name = e.target.value;
-            }
-        });
+        this.nameInput.addEventListener('change', e => this.changeName(e.target.value));
 
         deleteButton.addEventListener('click', () => this.delete());
 
@@ -120,17 +113,7 @@ PERT.Node = class Node
             PERT.currentProject.nodes[from].connect(edgeId, PERT.currentProject.nodes[id]);
         });
 
-        critical.addEventListener('click', () => {
-            if (config.critical) {
-                node.classList.remove('critical');
-                config.critical = false;
-            } else {
-                node.classList.add('critical');
-                config.critical = true;
-            }
-            this.redrawEdges();
-            PERT.currentProject.recaculateResourceConstraints();
-        });
+        critical.addEventListener('click', () => this.toggleCritical());
 
         edgeLink.addEventListener('dragstart', e => {
             const edgeId = PERT.currentProject.config.ns('edges').findFreeKey('e');
@@ -161,7 +144,7 @@ PERT.Node = class Node
             });
         });
 
-        this.dates.forEach((node, index) => {
+        this.dateInputs.forEach((node, index) => {
             const name = index ? 'end' : 'start';
             node.addEventListener('change', e => {
                 config[name] = e.target.value;
@@ -246,6 +229,33 @@ PERT.Node = class Node
             });
         }
         PERT.currentProject.recaculateResourceConstraints();
+    }
+
+    toggleCritical()
+    {
+        const config = this.configData;
+        if (config.critical) {
+            this.node.classList.remove('critical');
+            config.critical = false;
+        } else {
+            this.node.classList.add('critical');
+            config.critical = true;
+        }
+        this.redrawEdges();
+        PERT.currentProject.recaculateResourceConstraints();
+    }
+
+    /**
+     * @param {String} name
+     */
+    changeName(name)
+    {
+        if (name === '') {
+            alert('Milestone name cannot be empty.');
+            this.nameInput.value = this.config.get('name');
+        } else {
+            this.config.set('name', name);
+        }
     }
 
     /**
@@ -366,7 +376,7 @@ PERT.Node = class Node
     updateDateConstraints(back, limit)
     {
         const neighbours = this.getNeighbours(back);
-        const inputs = this.dates;
+        const inputs = this.dateInputs;
         const node = this.configData;
         if (back) {
             if (inputs[1].max && (!limit || inputs[1].max < limit)) {
