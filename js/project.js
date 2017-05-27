@@ -65,22 +65,7 @@ PERT.Project = class Project
         project.querySelector('.project-export').addEventListener('click', () => this.export());
         project.querySelector('.project-rename').addEventListener('click', () => this.rename());
         project.querySelector('.project-delete').addEventListener('click', () => this.delete());
-
-        project.querySelector('.prorect-add-node').addEventListener('click', () => {
-            let newName, promptText = '';
-            for (;;) {
-                promptText += 'Please enter a name for the new milestone:';
-                newName = prompt(promptText, newName);
-                if (newName === null) {
-                    return;
-                } else if (newName === '') {
-                    promptText = 'The new milestone name cannot be empty.\n';
-                } else {
-                    break;
-                }
-            }
-            this.addNode(newName);
-        });
+        project.querySelector('.prorect-add-node').addEventListener('click', () => this.addNode());
 
         const projectArea = PERT.ui('area').querySelector('.project-area');
 
@@ -190,11 +175,21 @@ PERT.Project = class Project
         reader.readAsDataURL(blob);
     }
 
-    /**
-     * @param {String} name
-     */
-    addNode(name)
+    addNode()
     {
+        let name, promptText = '';
+        for (;;) {
+            promptText += 'Please enter a name for the new milestone:';
+            name = prompt(promptText, name);
+            if (name === null) {
+                return;
+            } else if (name === '') {
+                promptText = 'The new milestone name cannot be empty.\n';
+            } else {
+                break;
+            }
+        }
+
         const nodes = this.config.ns('nodes');
         const id = nodes.findFreeKey('n');
 
