@@ -248,10 +248,12 @@ PERT.Project = class Project
         if (type !== 'name') {
             value = Math.max(0, parseFloat(value) || 0);
         }
+
         if (!resources.has(id)) {
             resources.set(id, {name: null, amount: null, concurrency: null});
             this.createResourceInputs();
         }
+
         if (type === 'name' && value === '') {
             if (confirm('Are you sure you want to delete this resource?')) {
                 resources.unset(id);
@@ -262,7 +264,10 @@ PERT.Project = class Project
         } else {
             element.value = resources.get(id)[type] = value;
         }
-        this.updateNodes();
+
+        for (const id in this.nodes) {
+            this.nodes[id].update();
+        }
     }
 
     recalculateDateConstraints()
@@ -409,13 +414,6 @@ PERT.Project = class Project
                 })
                 .forEach(td => row.appendChild(td));
             statArea.appendChild(row);
-        }
-    }
-
-    updateNodes()
-    {
-        for (const id in this.nodes) {
-            this.nodes[id].update();
         }
     }
 };

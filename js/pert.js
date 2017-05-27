@@ -29,7 +29,6 @@ const PERT = { // eslint-disable-line no-unused-vars
         return sum;
     },
 
-
     /**
      * @param {String} name
      * @returns {HTMLElement}
