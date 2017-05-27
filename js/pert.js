@@ -14,6 +14,21 @@ const PERT = { // eslint-disable-line no-unused-vars
         return multiplier * Math.round(number / multiplier);
     },
 
+    /**
+     * @param {...Object} objects
+     * @returns {Object}
+     */
+    sumObjects(...objects)
+    {
+        const sum = {};
+        for (const object of objects) {
+            for (const key in object) {
+                sum[key] = (sum[key] || 0) + object[key];
+            }
+        }
+        return sum;
+    },
+
 
     /**
      * @param {String} name
