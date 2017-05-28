@@ -5,13 +5,13 @@ const PERT = { // eslint-disable-line no-unused-vars
 
     /**
      * @param {Number} number
-     * @param {Number} [precision=0]
+     * @param {Number} [nearest=1]
      * @returns {Number}
      */
-    round(number, precision)
+    round(number, nearest)
     {
-        const multiplier = Math.pow(10, typeof precision === 'number' ? -precision : 0);
-        return multiplier * Math.round(number / multiplier);
+        nearest = nearest || 1;
+        return Math.round(number / nearest) * nearest;
     },
 
     /**

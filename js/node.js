@@ -254,8 +254,8 @@ PERT.Node = class Node
     {
         const config = this.configData;
 
-        config.top = PERT.round(Math.max(y - (this.dragNode.offsetTop + this.dragNode.offsetHeight/2), 0), -1);
-        config.left = PERT.round(Math.max(x - (this.dragNode.offsetLeft + this.dragNode.offsetWidth/2), 0), -1);
+        config.top = PERT.round(Math.max(y - (this.dragNode.offsetTop + this.dragNode.offsetHeight/2), 0), 25);
+        config.left = PERT.round(Math.max(x - (this.dragNode.offsetLeft + this.dragNode.offsetWidth/2), 0), 25);
         this.node.style.top = `${config.top}px`;
         this.node.style.left = `${config.left}px`;
         this.redrawEdges();
