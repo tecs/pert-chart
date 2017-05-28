@@ -41,9 +41,9 @@ PERT.Node = class Node
         }
 
         const deleteButton = node.querySelector('.node-delete');
-        const drag = node.querySelector('.node-drag');
         const critical = node.querySelector('.node-critical');
         const edgeLink = node.querySelector('.node-edge');
+        this.dragNode = node.querySelector('.node-drag');
         this.dateInputs = node.querySelectorAll('.node-dates input');
         this.nameInput = node.querySelector('.node-name');
 
@@ -65,16 +65,8 @@ PERT.Node = class Node
 
         deleteButton.addEventListener('click', () => this.delete());
 
-        drag.addEventListener('mousedown', e => {
-            PERT.currentProject.moveNode = {
-                top: e.clientY,
-                left: e.clientX,
-                originalTop: config.top,
-                originalLeft: config.left,
-                node,
-                config,
-                id
-            };
+        this.dragNode.addEventListener('mousedown', e => {
+            PERT.currentProject.moveNode = this;
             e.preventDefault();
         });
 
@@ -256,6 +248,17 @@ PERT.Node = class Node
         } else {
             this.config.set('name', name);
         }
+    }
+
+    drag(x, y)
+    {
+        const config = this.configData;
+
+        config.top = PERT.round(Math.max(y - (this.dragNode.offsetTop + this.dragNode.offsetHeight/2), 0), -1);
+        config.left = PERT.round(Math.max(x - (this.dragNode.offsetLeft + this.dragNode.offsetWidth/2), 0), -1);
+        this.node.style.top = `${config.top}px`;
+        this.node.style.left = `${config.left}px`;
+        this.redrawEdges();
     }
 
     /**

@@ -65,18 +65,7 @@ PERT.Project = class Project
 
         projectArea.addEventListener('mousemove', e => {
             if (this.moveNode) {
-                this.moveNode.config.top = PERT.round(
-                    Math.max(this.moveNode.originalTop + e.clientY - this.moveNode.top, 0),
-                    -1
-                );
-                this.moveNode.config.left = PERT.round(
-                    Math.max(this.moveNode.originalLeft + e.clientX - this.moveNode.left, 0),
-                    -1
-                );
-                this.moveNode.node.style.top = `${this.moveNode.config.top}px`;
-                this.moveNode.node.style.left = `${this.moveNode.config.left}px`;
-
-                this.nodes[this.moveNode.id].redrawEdges();
+                this.moveNode.drag(e.clientX, e.clientY);
             } else {
                 let nodeId = null;
                 let element = e.srcElement;
