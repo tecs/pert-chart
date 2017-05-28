@@ -65,7 +65,7 @@ PERT.Project = class Project
 
         projectArea.addEventListener('mousemove', e => {
             if (this.moveNode) {
-                this.moveNode.drag(e.clientX, e.clientY);
+                this.moveNode.drag(e.clientX + projectArea.scrollLeft, e.clientY + projectArea.scrollTop);
             } else {
                 let nodeId = null;
                 let element = e.srcElement;
