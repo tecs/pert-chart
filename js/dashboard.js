@@ -54,9 +54,12 @@ PERT.Dashboard = class Dashboard
         PERT.currentProject.drawNodes(); // TODO: Find a better way to do this.
     }
 
-    static deleteProject()
+    /**
+     * @param {String} name
+     */
+    static deleteProject(name)
     {
-        PERT.config.unset(PERT.currentProject.name);
+        PERT.config.unset(name);
         PERT.config.commit();
         window.location.reload();
     }
