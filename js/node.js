@@ -61,8 +61,9 @@ PERT.Node = class Node
 
         this.update();
 
-        this.nameInput.addEventListener('change', e => this.changeName(e.target.value));
+        this.nameInput.addEventListener('change', e => this.rename(e.target.value));
 
+        critical.addEventListener('click', () => this.toggleCritical());
         deleteButton.addEventListener('click', () => this.delete());
 
         this.dragNode.addEventListener('mousedown', e => {
@@ -104,8 +105,6 @@ PERT.Node = class Node
             PERT.currentProject.config.ns('edges').set(edgeId, {from, to: id});
             PERT.currentProject.nodes[from].connect(edgeId, PERT.currentProject.nodes[id]);
         });
-
-        critical.addEventListener('click', () => this.toggleCritical());
 
         edgeLink.addEventListener('dragstart', e => {
             const edgeId = PERT.currentProject.config.ns('edges').findFreeKey('e');
@@ -240,7 +239,7 @@ PERT.Node = class Node
     /**
      * @param {String} name
      */
-    changeName(name)
+    rename(name)
     {
         if (name === '') {
             alert('Milestone name cannot be empty.');
