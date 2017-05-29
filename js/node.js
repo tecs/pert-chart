@@ -71,7 +71,7 @@ PERT.Node = class Node
         });
 
         node.addEventListener('dragover', e => {
-            const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeid').pop();
+            const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeId').pop();
             let element = e.target;
             while (element && !element.classList.contains('node')) {
                 element = element.parentNode;
@@ -100,7 +100,7 @@ PERT.Node = class Node
 
         node.addEventListener('drop', e => {
             const from = e.dataTransfer.getData('id');
-            const edgeId = e.dataTransfer.getData('edgeid');
+            const edgeId = e.dataTransfer.getData('edgeId');
             PERT.currentProject.config.ns('edges').set(edgeId, {from, to: id});
             PERT.currentProject.nodes[from].connect(edgeId, PERT.currentProject.nodes[id]);
         });
@@ -112,13 +112,13 @@ PERT.Node = class Node
             e.dataTransfer.dropEffect = 'move';
             e.dataTransfer.setData(id, id);
             e.dataTransfer.setData('id', id);
-            e.dataTransfer.setData('edgeid', edgeId);
+            e.dataTransfer.setData('edgeId', edgeId);
             e.dataTransfer.setDragImage(new Image(), 0, 0);
             e.target.redrawEdge = (x, y) => {
                 const edge = PERT.currentProject.nodes[id].createEdge(x, y, edgeId);
                 edge.classList.add('edge-moving');
-                if (!node.newedge) {
-                    node.newedge = edge;
+                if (!node.newEdge) {
+                    node.newEdge = edge;
                     PERT.ui('area').querySelector('.project-area').appendChild(edge);
                 }
             };
@@ -127,11 +127,11 @@ PERT.Node = class Node
         edgeLink.addEventListener('dragend', e => {
             e.dataTransfer.clearData();
             window.requestAnimationFrame(() => {
-                if (!PERT.currentProject.config.ns('edges').has(node.newedge.id)) {
-                    node.newedge.parentNode.removeChild(node.newedge);
+                if (!PERT.currentProject.config.ns('edges').has(node.newEdge.id)) {
+                    node.newEdge.parentNode.removeChild(node.newEdge);
                 }
-                node.newedge.classList.remove('edge-moving');
-                delete node.newedge;
+                node.newEdge.classList.remove('edge-moving');
+                delete node.newEdge;
                 delete node.redrawEdge;
             });
         });
@@ -217,10 +217,10 @@ PERT.Node = class Node
             input.addEventListener('change', e => {
                 nodeResources[resourceId] = e.target.value = parseFloat(e.target.value) || 0;
                 cell1.className = cell2.className = (e.target.value === '0' ? 'empty' : '');
-                PERT.currentProject.recaculateResourceConstraints();
+                PERT.currentProject.recalculateResourceConstraints();
             });
         }
-        PERT.currentProject.recaculateResourceConstraints();
+        PERT.currentProject.recalculateResourceConstraints();
     }
 
     toggleCritical()
@@ -234,7 +234,7 @@ PERT.Node = class Node
             config.critical = true;
         }
         this.redrawEdges();
-        PERT.currentProject.recaculateResourceConstraints();
+        PERT.currentProject.recalculateResourceConstraints();
     }
 
     /**
@@ -292,13 +292,13 @@ PERT.Node = class Node
     drawEdge(id)
     {
         const node = this.neighbours.back[id] || this.neighbours.forward[id];
-        const critcal1 = this.config.get('critical');
+        const critical = this.config.get('critical');
         const nodeConfig = node.configData;
         const yOffset2 = nodeConfig.top + node.node.clientHeight / 2;
         const edge = this.createEdge(nodeConfig.left, yOffset2, id);
-        if (critcal1 && nodeConfig.critical && !edge.classList.contains('critical')) {
+        if (critical && nodeConfig.critical && !edge.classList.contains('critical')) {
             edge.classList.add('critical');
-        } else if (!(critcal1 && nodeConfig.critical) && edge.classList.contains('critical')) {
+        } else if (!(critical && nodeConfig.critical) && edge.classList.contains('critical')) {
             edge.classList.remove('critical');
         }
         if (!edge.parentNode) {

@@ -59,7 +59,7 @@ PERT.Project = class Project
         project.querySelector('.project-export').addEventListener('click', () => this.export());
         project.querySelector('.project-rename').addEventListener('click', () => this.rename());
         project.querySelector('.project-delete').addEventListener('click', () => this.delete());
-        project.querySelector('.prorect-add-node').addEventListener('click', () => this.addNode());
+        project.querySelector('.project-add-node').addEventListener('click', () => this.addNode());
 
         const projectArea = PERT.ui('area').querySelector('.project-area');
 
@@ -175,7 +175,7 @@ PERT.Project = class Project
         this.recalculateDateConstraints();
     }
 
-    drawNodes()
+    drawElements()
     {
         const nodes = this.config.ns('nodes');
         const edges = this.config.get('edges');
@@ -197,7 +197,7 @@ PERT.Project = class Project
         delete this.nodes[id];
         this.config.ns('nodes').unset(id);
         this.recalculateDateConstraints();
-        this.recaculateResourceConstraints();
+        this.recalculateResourceConstraints();
     }
 
     /**
@@ -210,8 +210,8 @@ PERT.Project = class Project
         }
         const elements = {name: null, amount: null, concurrency: null};
         const config = this.config.ns('resources').getData();
-        const resource = document.createElement('div');
 
+        const resource = document.createElement('div');
         for (const type in elements) {
             elements[type] = document.createElement('input');
             elements[type].type = 'text';
@@ -290,10 +290,10 @@ PERT.Project = class Project
                 project[1].min = value;
             }
         });
-        this.recaculateResourceConstraints();
+        this.recalculateResourceConstraints();
     }
 
-    recaculateResourceConstraints()
+    recalculateResourceConstraints()
     {
         const nodes = this.config.get('nodes');
         const nodesOrdered = this
@@ -303,11 +303,12 @@ PERT.Project = class Project
             .sort((a, b) => (nodes[a].start || nodes[a].end) > (nodes[b].start || nodes[b].end) ? 1 : -1);
         const resources = this.config.get('resources');
         const resourcesLeft = {}, concurrencies = {};
-        const events = [];
         for (const resourceId in resources) {
             resourcesLeft[resourceId] = resources[resourceId].amount;
             concurrencies[resourceId] = resources[resourceId].concurrency;
         }
+
+        const events = [];
         for (const nodeId of nodesOrdered) {
             const node = nodes[nodeId];
             if (!(nodeId in this.nodes)) {
@@ -357,8 +358,8 @@ PERT.Project = class Project
                 const node = nodes[nodeId];
                 const nodeElement = document.getElementById(nodeId);
                 const resourceCells = nodeElement.querySelectorAll('.node-resources td');
-                const index = Object.keys(node.resources).indexOf(resourceId) * 2;
 
+                const index = Object.keys(node.resources).indexOf(resourceId) * 2;
                 resourceCells[index].classList.add('red');
                 resourceCells[index+1].classList.add('red');
                 nodeElement.classList.add('red');

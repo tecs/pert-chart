@@ -51,7 +51,7 @@ PERT.Dashboard = class Dashboard
 
         PERT.config.reset();
         PERT.currentProject = new PERT.Project(name, PERT.config.ns(name));
-        PERT.currentProject.drawNodes(); // TODO: Find a better way to do this.
+        PERT.currentProject.drawElements(); // TODO: Find a better way to do this.
     }
 
     /**
@@ -93,10 +93,10 @@ PERT.Dashboard = class Dashboard
 
     static initializeUi()
     {
-        PERT.ui('menu-collapse').onclick = () => PERT.ui('menu').classList.toggle('menu-collapsed');
-
         Dashboard.redrawProjectsSelector();
 
+        // Collapse menu arrow
+        PERT.ui('menu-collapse').onclick = () => PERT.ui('menu').classList.toggle('menu-collapsed');
         PERT.ui('menu-contents-new').addEventListener('click', () => {
             const newName = Dashboard.getNewProjectName();
 
