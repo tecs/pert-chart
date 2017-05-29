@@ -1,5 +1,9 @@
 PERT.Dashboard = class Dashboard
 {
+    /**
+     * Redraws the project selector according to the data in the global
+     * configuration.
+     */
     static redrawProjectsSelector()
     {
         const select = PERT.ui('menu-contents-projects');
@@ -13,6 +17,9 @@ PERT.Dashboard = class Dashboard
     }
 
     /**
+     * Determines if it is safe to refresh or navigate away from the current
+     * page, based on whether or not there are uncommitted changes to the global
+     * configuration.
      * @param {String} [action]
      * @param {Boolean} [returnMessage]
      * @returns {Boolean|String}
@@ -30,6 +37,8 @@ PERT.Dashboard = class Dashboard
     }
 
     /**
+     * Creates a new empty project with the supplied name, discarding any
+     * pending global configuration changes.
      * @param {String} name
      */
     static createProject(name)
@@ -41,6 +50,8 @@ PERT.Dashboard = class Dashboard
     }
 
     /**
+     * Loads and draws the supplied project, discarding any global
+     * configuration changes.
      * @param {String} name
      */
     static loadProject(name)
@@ -55,6 +66,7 @@ PERT.Dashboard = class Dashboard
     }
 
     /**
+     * Deletes the supplied project and reloads the page.
      * @param {String} name
      */
     static deleteProject(name)
@@ -65,6 +77,7 @@ PERT.Dashboard = class Dashboard
     }
 
     /**
+     * Opens the new project name dialog, suggesting an unused name.
      * @param {Boolean} [rename=false]
      * @returns {String|null}
      */
@@ -91,12 +104,18 @@ PERT.Dashboard = class Dashboard
         }
     }
 
+    /**
+     * Initializes and sets up all UI event handlers, and loads the last opened
+     * project.
+     */
     static initializeUi()
     {
         Dashboard.redrawProjectsSelector();
 
         // Collapse menu arrow
         PERT.ui('menu-collapse').onclick = () => PERT.ui('menu').classList.toggle('menu-collapsed');
+
+        // New project
         PERT.ui('menu-contents-new').addEventListener('click', () => {
             const newName = Dashboard.getNewProjectName();
 
@@ -106,16 +125,19 @@ PERT.Dashboard = class Dashboard
             }
         });
 
+        // Import project
         PERT.ui('menu-contents-import').addEventListener('click', () => {
             const newName = Dashboard.getNewProjectName();
 
             if (newName !== null) {
+                // Create a file input element
                 const file = document.createElement('input');
                 file.type = 'file';
                 file.accept = '.pert';
                 file.addEventListener('change', () => {
                     const reader = new FileReader();
 
+                    // Import the JSON from selected file
                     reader.addEventListener('load', () => {
                         PERT.config.reset();
                         PERT.config.set(newName, JSON.parse(reader.result));
@@ -128,10 +150,13 @@ PERT.Dashboard = class Dashboard
                         reader.readAsText(file.files[0]);
                     }
                 });
+
+                // Invoke the file selection dialog
                 file.click();
             }
         });
 
+        // Switch project
         PERT.ui('menu-contents-projects').addEventListener('change', e => {
             if (Dashboard.shouldStayOnPage()) {
                 return;
@@ -139,6 +164,7 @@ PERT.Dashboard = class Dashboard
             Dashboard.loadProject(e.target.options[e.target.selectedIndex].value);
         });
 
+        // Refresh and navigate away
         window.addEventListener('beforeunload', e => {
             const message = Dashboard.shouldStayOnPage(null, true);
             if (message) {

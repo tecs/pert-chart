@@ -4,6 +4,7 @@ const PERT = { // eslint-disable-line no-unused-vars
     currentStats: null,
 
     /**
+     * Rounds the supplied number to the nearest provided decimal.
      * @param {Number} number
      * @param {Number} [nearest=1]
      * @returns {Number}
@@ -15,6 +16,7 @@ const PERT = { // eslint-disable-line no-unused-vars
     },
 
     /**
+     * Sums the matching properties of the supplied objects.
      * @param {...Object} objects
      * @returns {Object}
      */
@@ -30,6 +32,7 @@ const PERT = { // eslint-disable-line no-unused-vars
     },
 
     /**
+     * A caching wrapper around `document.getElementById()`.
      * @param {String} name
      * @returns {HTMLElement}
      */

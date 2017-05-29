@@ -5,10 +5,14 @@ PERT.Node = class Node
         this.id = id;
         this.config = configStore;
         const config = this.configData;
+
+        // Default configuration for new nodes
         if (!this.config.keys().length) {
             const nodes = PERT.currentProject.config.ns('nodes');
             const top = 200;
             let left = 400;
+
+            // Calculate the left offset based on the node furthest to the right
             for (const nodeId of nodes.keys()) {
                 if (nodeId !== id) {
                     const nodeElement = document.getElementById(nodeId);
@@ -29,6 +33,7 @@ PERT.Node = class Node
 
         this.neighbours = {back: {}, forward: {}};
 
+        // Setup node UI
         const template = PERT.ui('templates').import.getElementById('NodeTemplate').content;
         const node = document.importNode(template, true).firstElementChild;
         this.node = node;
@@ -61,18 +66,24 @@ PERT.Node = class Node
 
         this.update();
 
+        // Name change
         this.nameInput.addEventListener('change', e => this.rename(e.target.value));
 
+        // Register UI button handlers
         critical.addEventListener('click', () => this.toggleCritical());
         deleteButton.addEventListener('click', () => this.delete());
 
+        // Drag start
         this.dragNode.addEventListener('mousedown', e => {
             PERT.currentProject.moveNode = this;
             e.preventDefault();
         });
 
+        // Edge drag handlers
         node.addEventListener('dragover', e => {
             const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeId').pop();
+
+            // Find the node over which the edge is dragged
             let element = e.target;
             while (element && !element.classList.contains('node')) {
                 element = element.parentNode;
@@ -81,6 +92,8 @@ PERT.Node = class Node
                 return;
             }
             const edges = PERT.currentProject.config.get('edges');
+
+            // Prevent creating loops
             const loops = (from, direct) => {
                 for (const edgeId in edges) {
                     const edge = edges[edgeId];
@@ -113,6 +126,8 @@ PERT.Node = class Node
             e.dataTransfer.setData('id', id);
             e.dataTransfer.setData('edgeId', edgeId);
             e.dataTransfer.setDragImage(new Image(), 0, 0);
+
+            // Append a custom edge redraw handler
             e.target.redrawEdge = (x, y) => {
                 const edge = PERT.currentProject.nodes[id].createEdge(x, y, edgeId);
                 edge.classList.add('edge-moving');
@@ -125,6 +140,8 @@ PERT.Node = class Node
 
         edgeLink.addEventListener('dragend', e => {
             e.dataTransfer.clearData();
+
+            // Make all DOM changes in a new frame to prevent drag interruption
             window.requestAnimationFrame(() => {
                 if (!PERT.currentProject.config.ns('edges').has(node.newEdge.id)) {
                     node.newEdge.parentNode.removeChild(node.newEdge);
@@ -135,6 +152,7 @@ PERT.Node = class Node
             });
         });
 
+        // Date change handlers
         this.dateInputs.forEach((node, index) => {
             const name = index ? 'end' : 'start';
             node.addEventListener('change', e => {
@@ -150,6 +168,7 @@ PERT.Node = class Node
     }
 
     /**
+     * The plain object representation of the node's configuration DataStore.
      * @returns {Object}
      */
     get configData()
@@ -157,6 +176,9 @@ PERT.Node = class Node
         return this.config.getData();
     }
 
+    /**
+     * Opens the node delete dialog and deletes the node.
+     */
     delete()
     {
         if (!confirm('Are you sure you want to delete the selected milestone?')) {
@@ -174,23 +196,30 @@ PERT.Node = class Node
         PERT.currentProject.deleteNode(this.id);
     }
 
+    /**
+     * Redraws the node resources and recalculates the resource constraints.
+     */
     update()
     {
         const resources = this.node.querySelector('.node-resources');
         const nodeResources = this.config.get('resources');
         const config = PERT.currentProject.config.get('resources');
 
+        // Delete the old resource elements and remove any resources from the
+        // node configuration that might not exist globally anymore
         resources.innerHTML = '';
-
         for (const resourceId in nodeResources) {
             if (!(resourceId in config)) {
                 delete nodeResources[resourceId];
             }
         }
 
+        // Define the resource grid width, fitting at most 3 items per column
         const resourcesPerRow = Math.floor(((Object.keys(config).length || 1) - 1) / 3) + 1;
         let i = 0;
         let row = null;
+
+        // Regenerate the resource table
         for (const resourceId in config) {
             if (!(resourceId in nodeResources)) {
                 nodeResources[resourceId] = 0;
@@ -222,6 +251,9 @@ PERT.Node = class Node
         PERT.currentProject.recalculateResourceConstraints();
     }
 
+    /**
+     * Toggles the critical path.
+     */
     toggleCritical()
     {
         const config = this.configData;
@@ -237,6 +269,7 @@ PERT.Node = class Node
     }
 
     /**
+     * Renames the node.
      * @param {String} name
      */
     rename(name)
@@ -249,6 +282,12 @@ PERT.Node = class Node
         }
     }
 
+    /**
+     * Moves the node to the specified coordinates, with the origin at the
+     * center of the drag handle.
+     * @param {Integer} x
+     * @param {Integer} y
+     */
     drag(x, y)
     {
         const config = this.configData;
@@ -261,6 +300,8 @@ PERT.Node = class Node
     }
 
     /**
+     * Creates or updates the supplied edge, with the given coordinates,
+     * returning its HTML element.
      * @param {Number} x2
      * @param {Number} y2
      * @param {String} [id]
@@ -270,12 +311,16 @@ PERT.Node = class Node
     {
         const x1 = this.config.get('left') + this.node.clientWidth;
         const y1 = this.config.get('top') + this.node.clientHeight / 2;
+
+        // Find or create an edge
         const edge = document.getElementById(id) || document.createElement('div');
         if (!edge.classList.contains('edge')) {
             edge.classList.add('edge');
             edge.id = id;
             edge.addEventListener('click', () => this.disconnect(id));
         }
+
+        // Reposition the edge and recalculate its angle
         const dx = x2 - x1;
         const dy = y2 - y1;
         edge.style.top = `${y1}px`;
@@ -286,13 +331,17 @@ PERT.Node = class Node
     }
 
     /**
+     * Draws the specified edge.
      * @param {String} id
      */
     drawEdge(id)
     {
+        // Find the target node
         const node = this.neighbours.back[id] || this.neighbours.forward[id];
         const critical = this.config.get('critical');
         const nodeConfig = node.configData;
+
+        // Point to the middle of the left side of the target node
         const yOffset2 = nodeConfig.top + node.node.clientHeight / 2;
         const edge = this.createEdge(nodeConfig.left, yOffset2, id);
         if (critical && nodeConfig.critical && !edge.classList.contains('critical')) {
@@ -305,17 +354,22 @@ PERT.Node = class Node
         }
     }
 
+    /**
+     * Redraws all edges connected to the node.
+     */
     redrawEdges()
     {
         for (const edgeId in this.neighbours.forward) {
             this.drawEdge(edgeId);
         }
         for (const edgeId in this.neighbours.back) {
+            // Back edges should be redrawn by their origin node
             this.neighbours.back[edgeId].drawEdge(edgeId);
         }
     }
 
     /**
+     * Connects to the supplied node, creating an edge with the given id.
      * @param {String} id
      * @param {PERT.Node} node
      * @param {Boolean} [back=false]
@@ -326,17 +380,20 @@ PERT.Node = class Node
             this.neighbours.back[id] = node;
         } else {
             this.neighbours.forward[id] = node;
+            // A reverse connection is made on the target node
             node.connect(id, this, true);
             this.drawEdge(id);
         }
     }
 
     /**
+     * Disconnects from the node linked by the supplied edge, deleting the edge.
      * @param {String} id
      */
     disconnect(id)
     {
         if (id in this.neighbours.forward) {
+            // Disconnect the reverse side as well
             this.neighbours.forward[id].disconnect(id);
             delete this.neighbours.forward[id];
             PERT.currentProject.config.ns('edges').unset(id);
@@ -348,6 +405,8 @@ PERT.Node = class Node
     }
 
     /**
+     * Returns the connected node neighbours in either the back of forward
+     * direction, optionally including all their neighbours recursively.
      * @param {Boolean} [back=false]
      * @param {Boolean} [recursive=false]
      * @returns {PERT.Node[]}
@@ -360,9 +419,9 @@ PERT.Node = class Node
             neighbours.push(this.neighbours[direction][edgeId]);
         }
         if (recursive) {
-            return Array.from(
-                new Set(
-                    neighbours.concat(
+            return Array.from( // Convert to array
+                new Set( // Maintain a unique list of nodes
+                    neighbours.concat( // Merge with all neighbours' neighbours
                         ...neighbours.map(neighbour => neighbour.getNeighbours(back, recursive))
                     )
                 )
@@ -372,6 +431,8 @@ PERT.Node = class Node
     }
 
     /**
+     * Recalculates and sets the limit for the minimum and maximum values for
+     * the node, recursively propagating to all neighbour nodes.
      * @param {Boolean} [back=false]
      * @param {String} [limit='']
      */
@@ -381,24 +442,42 @@ PERT.Node = class Node
         const inputs = this.dateInputs;
         const node = this.configData;
         if (back) {
+            // If the limit is not set, or it is later than the the maximum node
+            // end date, set it to that date
             if (inputs[1].max && (!limit || inputs[1].max < limit)) {
                 limit = inputs[1].max;
             }
+
+            // The node should not end later than the limit
             inputs[1].max = limit;
+
+            // The node should not start later than its end or the limit
             inputs[0].max = this.node.end || limit;
+
+            // Set the limit to the earliest date available
             limit = node.start || inputs[0].max;
         } else {
+            // If the limit is not set, or it is earlier than the the minimum
+            // node start date, set it to that date
             if (inputs[0].min && (!limit || inputs[0].min > limit)) {
                 limit = inputs[0].min;
             }
+
+            // The node should not start earlier than the limit
             inputs[0].min = limit;
+
+            // The node should not end earlier than its start or the limit
             inputs[1].min = node.start || limit;
+
+            // Set the limit to the latest date available
             limit = node.end || inputs[1].min;
         }
         neighbours.forEach(neighbour => neighbour.updateDateConstraints(back, limit));
     }
 
     /**
+     * Calculates the resources cost of the node, optionally including the sum
+     * of all neighbour nodes, this node is dependent on recursively.
      * @param {Boolean} [recursive=false]
      * @returns {Object}
      */
@@ -417,6 +496,8 @@ PERT.Node = class Node
     }
 
     /**
+     * Returns the depth of the node, taking the longest path to a starting
+     * node.
      * @returns {Number}
      */
     level()
