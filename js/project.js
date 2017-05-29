@@ -325,7 +325,7 @@ PERT.Project = class Project
                 }
                 resourcesLeft[resourceId] -= node.resources[resourceId];
                 const index = Object.keys(node.resources).indexOf(resourceId) * 2;
-                if (node.resources[resourceId] && resourcesLeft[resourceId] < 0) {
+                if (node.resources[resourceId] > 0 && resourcesLeft[resourceId] < 0) {
                     resourceCells[index].classList.add('red');
                     resourceCells[index+1].classList.add('red');
                     nodeElement.classList.add('red');
@@ -334,7 +334,7 @@ PERT.Project = class Project
                     resourceCells[index+1].classList.remove('red');
                 }
 
-                if (resources[resourceId].concurrency && node.resources[resourceId]) {
+                if (resources[resourceId].concurrency && node.resources[resourceId] > 0) {
                     const dates = this.nodes[nodeId].dateInputs;
                     events.push({nodeId, resourceId, start: true, time: dates[0].value || dates[1].min});
                     events.push({nodeId, resourceId, start: false, time: dates[1].value || dates[0].max || 'z'});
