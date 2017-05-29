@@ -385,14 +385,14 @@ PERT.Node = class Node
                 limit = inputs[1].max;
             }
             inputs[1].max = limit;
-            inputs[0].max = this.node.end || inputs[1].max;
+            inputs[0].max = this.node.end || limit;
             limit = node.start || inputs[0].max;
         } else {
             if (inputs[0].min && (!limit || inputs[0].min > limit)) {
                 limit = inputs[0].min;
             }
             inputs[0].min = limit;
-            inputs[1].min = node.start || inputs[0].min;
+            inputs[1].min = node.start || limit;
             limit = node.end || inputs[1].min;
         }
         neighbours.forEach(neighbour => neighbour.updateDateConstraints(back, limit));
