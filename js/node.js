@@ -83,15 +83,21 @@ PERT.Node = class Node
         node.addEventListener('dragover', e => {
             const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeId').pop();
 
-            // Find the node over which the edge is dragged
-            let element = e.target;
-            while (element && !element.classList.contains('node')) {
-                element = element.parentNode;
-            }
-            if (element && originalId === id) {
+            // Prevent same the source and target
+            if (originalId === id) {
                 return;
             }
             const edges = PERT.currentProject.config.get('edges');
+
+            // Prevent the source node from being earlier than the target
+            const upperLimit = this.dateInputs[0].value || this.dateInputs[0].max;
+            if (upperLimit) {
+                const source = PERT.currentProject.nodes[originalId];
+                const lowerLimit = source.dateInputs[1].value || source.dateInputs[1].min;
+                if (lowerLimit && lowerLimit > upperLimit) {
+                    return;
+                }
+            }
 
             // Prevent creating loops
             const loops = (from, direct) => {
