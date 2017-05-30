@@ -462,7 +462,7 @@ PERT.Node = class Node
             inputs[1].max = limit;
 
             // The node should not start later than its end or the limit
-            inputs[0].max = this.node.end || limit;
+            inputs[0].max = node.end || limit;
 
             // Set the limit to the earliest date available
             limit = node.start || inputs[0].max;
