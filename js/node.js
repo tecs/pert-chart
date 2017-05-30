@@ -117,6 +117,7 @@ PERT.Node = class Node
             const edgeId = e.dataTransfer.getData('edgeId');
             PERT.currentProject.config.ns('edges').set(edgeId, {from, to: id});
             PERT.currentProject.nodes[from].connect(edgeId, PERT.currentProject.nodes[id]);
+            PERT.currentProject.recalculateDateConstraints();
         });
 
         edgeLink.addEventListener('dragstart', e => {
@@ -317,7 +318,10 @@ PERT.Node = class Node
         if (!edge.classList.contains('edge')) {
             edge.classList.add('edge');
             edge.id = id;
-            edge.addEventListener('click', () => this.disconnect(id));
+            edge.addEventListener('click', () => {
+                this.disconnect(id);
+                PERT.currentProject.recalculateDateConstraints();
+            });
         }
 
         // Reposition the edge and recalculate its angle
