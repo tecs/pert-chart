@@ -107,7 +107,7 @@ PERT.Project = class Project
         projectArea.addEventListener('drag', e => {
             // If there's a custom redraw handler, call it
             if (e.target.redrawEdge) {
-                e.target.redrawEdge(e.pageX, e.pageY);
+                e.target.redrawEdge(e.clientX + projectArea.scrollLeft, e.clientY + projectArea.scrollTop);
             }
         });
 
