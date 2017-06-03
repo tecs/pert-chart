@@ -72,14 +72,6 @@ html, body {
     }
 }
 
-#menu-contents-save,
-#menu-contents-export,
-#menu-contents-delete,
-#menu-contents-rename,
-#menu-contents-add-node {
-    display: none;
-}
-
 .menu-contents-project-loaded > button {
     display: inline !important;
 }

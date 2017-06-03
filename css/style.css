@@ -19,8 +19,6 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 #menu-contents-project .project-dates input:last-child { float: right; }
 
-#menu-contents-save, #menu-contents-export, #menu-contents-delete, #menu-contents-rename, #menu-contents-add-node { display: none; }
-
 .menu-contents-project-loaded > button { display: inline !important; }
 
 .project-resources input { width: calc(100%/3); box-sizing: border-box; }
