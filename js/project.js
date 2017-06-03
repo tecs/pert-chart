@@ -175,9 +175,17 @@ PERT.Project = class Project
             alert('The project has already been started.');
             return;
         }
+        const config = this.configData;
+        let hasAllDates = !!config.start && !!config.end;
+        for (const key in config.nodes) {
+            hasAllDates &= !!config.nodes[key].start && !!config.nodes[key].end;
+        }
+        if (!hasAllDates) {
+            alert('Please set the project\'s and all nodes\'s start and end dates before starting the project');
+            return;
+        }
         if (confirm('Are you sure you want to start the current project? Once started, all future modifications will \
 become a part of the requirement changes report.')) {
-            const config = this.configData;
             this.config.set('original', {
                 resources: this.config.deepCopy(config.resources),
                 nodes: this.config.deepCopy(config.nodes),
