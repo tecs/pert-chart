@@ -42,6 +42,10 @@ PERT.Project = class Project
         dates[0].value = configData.start;
         dates[1].value = configData.end;
 
+        if (config.has('original')) {
+            project.classList.add('project-started');
+        }
+
         // Date change handlers
         dates.forEach((node, index) => {
             const name = index ? 'end' : 'start';
@@ -66,6 +70,7 @@ PERT.Project = class Project
         project.querySelector('.project-export').addEventListener('click', () => this.export());
         project.querySelector('.project-rename').addEventListener('click', () => this.rename());
         project.querySelector('.project-delete').addEventListener('click', () => this.delete());
+        project.querySelector('.project-start').addEventListener('click', () => this.start());
         project.querySelector('.project-add-node').addEventListener('click', () => this.addNode());
 
         // Register pre-HTML5 drag and drop and stats hover handlers
@@ -158,6 +163,30 @@ PERT.Project = class Project
         if (confirm('Are you sure you want to delete the current project? This action cannot be undone.')) {
             PERT.Dashboard.deleteProject(this.name);
         }
+    }
+
+    /**
+     * Opens the project start dialog and starts the project, preserving an
+     * immutable copy of the current state.
+     */
+    start()
+    {
+        if (this.config.has('original')) {
+            alert('The project has already been started.');
+            return;
+        }
+        if (confirm('Are you sure you want to start the current project? Once started, all future modifications will \
+become a part of the requirement changes report.')) {
+            const config = this.configData;
+            this.config.set('original', {
+                resources: this.config.deepCopy(config.resources),
+                nodes: this.config.deepCopy(config.nodes),
+                edges: this.config.deepCopy(config.edges),
+                start: config.start,
+                end: config.end
+            });
+        }
+
     }
 
     /**

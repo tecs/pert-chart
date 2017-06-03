@@ -72,6 +72,10 @@ html, body {
     }
 }
 
+.project-started .project-start {
+    display: none;
+}
+
 .menu-contents-project-loaded > button {
     display: inline !important;
 }
