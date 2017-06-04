@@ -111,6 +111,10 @@ html, body {
         position: absolute;
     }
 
+    input, button {
+        background-color: transparent;
+    }
+
     .empty {
         display: none;
     }
@@ -118,7 +122,6 @@ html, body {
     .node-name {
         top: 0;
         left: 0;
-        background: transparent;
         border: none;
         padding: 5px;
         width: $node-width - 100px;
@@ -132,7 +135,6 @@ html, body {
         height: 20px;
         padding: 0;
         visibility: hidden;
-        background: transparent;
         cursor: pointer;
         border: none;
         font-size: 20px;
@@ -158,7 +160,6 @@ html, body {
         visibility: hidden;
         border: none;
         border-radius: 10px;
-        background: transparent;
         cursor: pointer;
         font-weight: bold;
         font-size: 16px;
@@ -253,6 +254,21 @@ html, body {
 
     &.red.critical {
         box-shadow: 0 0 7px 1px rgba(255,0,0,0.7);
+    }
+
+    &.node-past {
+        background-color: #F0F0F0;
+        > * {
+            opacity: 0.4;
+        }
+    }
+
+    &.node-current {
+        background-color: #D8F1D8;
+    }
+
+    &.node-upcoming {
+        background-color: #D8E4F1;
     }
 }
 

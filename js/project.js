@@ -193,6 +193,7 @@ become a part of the requirement changes report.')) {
                 start: config.start,
                 end: config.end
             });
+            this.recalculateDateAdvancement();
         }
 
     }
@@ -389,6 +390,7 @@ become a part of the requirement changes report.')) {
             }
         });
         this.recalculateResourceConstraints();
+        this.recalculateDateAdvancement();
     }
 
     /**
@@ -491,6 +493,36 @@ become a part of the requirement changes report.')) {
                 nodeElement.classList.add('red');
             }
         });
+    }
+
+    /**
+     * Calculate node colors for started projects.
+     */
+    recalculateDateAdvancement()
+    {
+        if (!this.config.has('original')) {
+            return;
+        }
+
+        // Get today's date without the time component
+        const now = new Date((new Date()).toISOString().substr(0, 10));
+        for (const nodeId in this.nodes) {
+            const node = this.nodes[nodeId].node;
+            node.classList.remove('node-past');
+            node.classList.remove('node-upcoming');
+            node.classList.remove('node-current');
+
+            const dates = this.nodes[nodeId].dateInputs;
+            const start = new Date(dates[0].value);
+            const end = new Date(dates[1].value);
+            if (now > end) {
+                node.classList.add('node-past');
+            } else if (now < start) {
+                node.classList.add('node-upcoming');
+            } else {
+                node.classList.add('node-current');
+            }
+        }
     }
 
     /**
