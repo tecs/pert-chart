@@ -530,7 +530,7 @@ become a part of the requirement changes report.')) {
 
         // Get today's date without the time component
         const now = new Date();
-        now.setUTCHours(0, 0, 0);
+        now.setUTCHours(0, 0, 0, 0);
         for (const nodeId in this.nodes) {
             const node = this.nodes[nodeId].node;
             node.classList.remove('node-past');
