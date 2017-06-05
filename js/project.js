@@ -139,7 +139,7 @@ PERT.Project = class Project
     }
 
     /**
-     * Whether or not the project's and all nodes's start and end dates have
+     * Whether or not the project's and all nodes' start and end dates have
      * been set.
      * @returns {Boolean}
      */
@@ -159,7 +159,7 @@ PERT.Project = class Project
     save()
     {
         if (this.isStarted && !this.hasAllDates) {
-            alert('Started projects must have their dates and all their nodes\'s start and end dates set to be saved.');
+            alert('Started projects must have their dates and all their nodes\' start and end dates set to be saved.');
             return;
         }
         this.config.get('stats').modifiedAt = Date.now();
@@ -205,7 +205,7 @@ PERT.Project = class Project
         }
         const config = this.configData;
         if (!this.hasAllDates) {
-            alert('Please set the project\'s and all nodes\'s start and end dates before starting the project.');
+            alert('Please set the project\'s and all nodes\' start and end dates before starting the project.');
             return;
         }
         if (confirm('Are you sure you want to start the current project? Once started, all future modifications will \
@@ -379,7 +379,7 @@ become a part of the requirement changes report.')) {
         const project = PERT.ui('menu-contents-project').querySelectorAll('.project-dates input');
         Object.assign(project[0], project[1], {min: '', max: ''});
 
-        // Reset all nodes's date constraints and find the left and rightmost
+        // Reset all nodes' date constraints and find the left and rightmost
         // nodes
         const left = [], right = [];
         for (const nodeId in this.nodes) {
