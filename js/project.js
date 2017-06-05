@@ -284,6 +284,21 @@ become a part of the requirement changes report.')) {
         }
         this.redrawStats();
         this.recalculateDateConstraints();
+
+        // Recalculate date advancement on the day following
+        const tomorrow = new Date();
+        tomorrow.setUTCHours(0, 0, 0, 0);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const interval = setInterval(() => {
+            // Stop interval if the project has been unloaded
+            if (PERT.currentProject !== this) {
+                clearInterval(interval);
+            }
+            if (tomorrow < new Date()) {
+                // Bump next update to the day following
+                tomorrow.setDate(tomorrow.getDate() + 1);
+            }
+        }, 50);
     }
 
     /**
