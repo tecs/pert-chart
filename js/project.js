@@ -42,7 +42,7 @@ PERT.Project = class Project
         dates[0].value = configData.start;
         dates[1].value = configData.end;
 
-        if (config.has('original')) {
+        if (this.isStarted) {
             project.classList.add('project-started');
         }
 
@@ -130,10 +130,38 @@ PERT.Project = class Project
     }
 
     /**
+     * Whether or not the project has been started.
+     * @returns {Boolean}
+     */
+    get isStarted()
+    {
+        return this.config.has('original');
+    }
+
+    /**
+     * Whether or not the project's and all nodes's start and end dates have
+     * been set.
+     * @returns {Boolean}
+     */
+    get hasAllDates()
+    {
+        const config = this.configData;
+        let hasAllDates = !!config.start && !!config.end;
+        for (const key in config.nodes) {
+            hasAllDates = hasAllDates && !!config.nodes[key].start && !!config.nodes[key].end;
+        }
+        return hasAllDates;
+    }
+
+    /**
      * Commits any changes made to the project.
      */
     save()
     {
+        if (this.isStarted && !this.hasAllDates) {
+            alert('Started projects must have their dates and all their nodes\'s start and end dates set to be saved.');
+            return;
+        }
         this.config.get('stats').modifiedAt = Date.now();
         this.config.commit();
     }
@@ -171,17 +199,13 @@ PERT.Project = class Project
      */
     start()
     {
-        if (this.config.has('original')) {
+        if (this.isStarted) {
             alert('The project has already been started.');
             return;
         }
         const config = this.configData;
-        let hasAllDates = !!config.start && !!config.end;
-        for (const key in config.nodes) {
-            hasAllDates &= !!config.nodes[key].start && !!config.nodes[key].end;
-        }
-        if (!hasAllDates) {
-            alert('Please set the project\'s and all nodes\'s start and end dates before starting the project');
+        if (!this.hasAllDates) {
+            alert('Please set the project\'s and all nodes\'s start and end dates before starting the project.');
             return;
         }
         if (confirm('Are you sure you want to start the current project? Once started, all future modifications will \
@@ -500,7 +524,7 @@ become a part of the requirement changes report.')) {
      */
     recalculateDateAdvancement()
     {
-        if (!this.config.has('original')) {
+        if (!this.isStarted) {
             return;
         }
 
