@@ -80,9 +80,14 @@ html, body {
     display: inline !important;
 }
 
-.project-resources input {
-    width: calc(100%/3);
-    box-sizing: border-box;
+.menu-contents-project-resource {
+    display: inline-block;
+
+    input {
+        width: calc(100%/3);
+        box-sizing: border-box;
+        float: left;
+    }
 }
 
 #area {

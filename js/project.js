@@ -325,34 +325,33 @@ become a part of the requirement changes report.')) {
             id = this.config.ns('resources').findFreeKey('r');
         }
 
-        // Define the inputs
-        const elements = {name: null, amount: null, concurrency: null};
         const config = this.config.ns('resources').getData();
+        const template = PERT.ui('templates').import.getElementById('ResourceTemplate').content;
+        const resource = document.importNode(template, true).firstElementChild;
 
-        // Create and pre-fill the inputs
-        const resource = document.createElement('div');
-        for (const type in elements) {
-            elements[type] = document.createElement('input');
-            elements[type].type = 'text';
-            elements[type].placeholder = type;
-            elements[type].value = config[id] ? config[id][type] : '';
-            elements[type].addEventListener('change', e => this.updateResource(id, type, e.target));
-            resource.appendChild(elements[type]);
-        }
+        // Pre-fill the inputs
+        const inputs = resource.querySelectorAll('input');
+        inputs[0].value = config[id] ? config[id].name : '';
+        inputs[0].addEventListener('change', e => this.updateResource(id, e.target));
 
-        resource.className = 'menu-contents-project-resource';
+        inputs[1].value = config[id] ? config[id].amount : '';
+        inputs[1].addEventListener('change', e => this.updateResource(id, e.target));
+
+        inputs[2].value = config[id] ? config[id].concurrency : '';
+        inputs[2].addEventListener('change', e => this.updateResource(id, e.target));
+
         PERT.ui('menu-contents-project').querySelector('.project-resources').appendChild(resource);
     }
 
     /**
      * Handles any project resource changes.
      * @param {String} id
-     * @param {String} type
      * @param {HTMLElement} element
      */
-    updateResource(id, type, element)
+    updateResource(id, element)
     {
         const resources = this.config.ns('resources');
+        const type = element.name;
         let value = element.value;
 
         // All fields that do not represent a name, should be a positive float
