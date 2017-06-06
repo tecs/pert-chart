@@ -483,12 +483,16 @@ become a part of the requirement changes report.')) {
                 // available, mark the node and resource inputs as insufficient
                 if (node.resources[resourceId] > 0 && resourcesLeft[resourceId] < 0) {
                     resourceCells[index].classList.add('red');
-                    resourceCells[index+1].classList.add('red');
+                    resourceCells[index + 1].classList.add('red');
                     nodeElement.classList.add('red');
+
+                    resourceCells[index].title = resourceCells[index + 1].title = 'Insufficient resources';
                 } else {
                     // Remove any previous indication of insufficient resources
                     resourceCells[index].classList.remove('red');
-                    resourceCells[index+1].classList.remove('red');
+                    resourceCells[index + 1].classList.remove('red');
+
+                    resourceCells[index].title = resourceCells[index + 1].title = '';
                 }
 
                 // Collect milestone start and end events
@@ -530,6 +534,12 @@ become a part of the requirement changes report.')) {
                 resourceCells[index].classList.add('red');
                 resourceCells[index+1].classList.add('red');
                 nodeElement.classList.add('red');
+
+                if (resourceCells[index].title) {
+                    resourceCells[index].title = resourceCells[index + 1].title += ' and concurrency';
+                } else {
+                    resourceCells[index].title = resourceCells[index + 1].title = 'Insufficient concurrency';
+                }
             }
         });
     }

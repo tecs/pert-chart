@@ -240,6 +240,7 @@ PERT.Node = class Node
 
             cell1.innerText = config[resourceId].name;
             const input = document.createElement('input');
+            input.type = 'number';
             input.value = nodeResources[resourceId];
             if (!nodeResources[resourceId]) {
                 cell1.className = cell2.className = 'empty';
@@ -326,6 +327,7 @@ PERT.Node = class Node
             edge.id = id;
             const deleteEdge = document.createElement('div');
             deleteEdge.innerText = '⨯';
+            deleteEdge.title = 'Disconnect';
             deleteEdge.classList.add('edge-delete');
             deleteEdge.addEventListener('click', () => {
                 this.disconnect(id);

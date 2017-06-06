@@ -77,6 +77,15 @@ PERT.Dashboard = class Dashboard
     }
 
     /**
+     * Expands or collapses the project menu.
+     */
+    static toggleMenu()
+    {
+        PERT.ui('menu-collapse').title = PERT.ui('menu').classList.contains('menu-collapsed') ? 'Collapse' : 'Expand';
+        PERT.ui('menu').classList.toggle('menu-collapsed');
+    }
+
+    /**
      * Opens the new project name dialog, suggesting an unused name.
      * @param {Boolean} [rename=false]
      * @returns {String|null}
@@ -113,7 +122,7 @@ PERT.Dashboard = class Dashboard
         Dashboard.redrawProjectsSelector();
 
         // Collapse menu arrow
-        PERT.ui('menu-collapse').onclick = () => PERT.ui('menu').classList.toggle('menu-collapsed');
+        PERT.ui('menu-collapse').onclick = () => Dashboard.toggleMenu();
 
         // New project
         PERT.ui('menu-contents-new').addEventListener('click', () => {

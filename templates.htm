@@ -1,14 +1,14 @@
 <template id="NodeTemplate">
     <div class="node">
-        <input class="node-name" type="text">
-        <div class="node-drag"></div>
-        <button class="node-critical">&excl;</button>
-        <button class="node-delete">&Cross;</button>
-        <div class="node-edge" draggable="true">&Rarr;</div>
+        <input class="node-name" type="text" title="Name">
+        <div class="node-drag" title="Drag"></div>
+        <button class="node-critical" title="Toggle critical">&excl;</button>
+        <button class="node-delete" title="Delete">&Cross;</button>
+        <div class="node-edge" draggable="true" title="Connect">&Rarr;</div>
         <table class="node-resources"></table>
         <div class="node-dates">
-            <input type="date" />
-            <input type="date" />
+            <input type="date" title="Start" />
+            <input type="date" title="End" />
         </div>
     </div>
 </template>
@@ -24,8 +24,8 @@
         <button class="project-add-node">add new milestone</button>
         <br /> <br />
         <div class="project-dates">
-            <input type="date" />
-            <input type="date" />
+            <input type="date" title="Start" />
+            <input type="date" title="End" />
         </div>
         <p>Resources:</p>
         <div class="project-resources"></div>
@@ -36,8 +36,8 @@
 
 <template id="ResourceTemplate">
     <div class="menu-contents-project-resource">
-        <input type="text" name="name" placeholder="name" />
-        <input type="number" name="amount" min="0" placeholder="amount" />
-        <input type="number" name="concurrency" min="0" placeholder="concurrency" />
+        <input type="text" name="name" placeholder="name" title="Name" />
+        <input type="number" name="amount" min="0" placeholder="amount" title="Amount" />
+        <input type="number" name="concurrency" min="0" placeholder="concurrency" title="Concurrency"/>
     </div>>
 </template>
