@@ -297,6 +297,7 @@ become a part of the requirement changes report.')) {
             if (tomorrow < new Date()) {
                 // Bump next update to the day following
                 tomorrow.setDate(tomorrow.getDate() + 1);
+                this.recalculateDateAdvancement();
             }
         }, 50);
     }
