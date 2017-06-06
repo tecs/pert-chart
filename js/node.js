@@ -324,10 +324,14 @@ PERT.Node = class Node
         if (!edge.classList.contains('edge')) {
             edge.classList.add('edge');
             edge.id = id;
-            edge.addEventListener('click', () => {
+            const deleteEdge = document.createElement('div');
+            deleteEdge.innerText = '⨯';
+            deleteEdge.classList.add('edge-delete');
+            deleteEdge.addEventListener('click', () => {
                 this.disconnect(id);
                 PERT.currentProject.recalculateDateConstraints();
             });
+            edge.appendChild(deleteEdge);
         }
 
         // Reposition the edge and recalculate its angle

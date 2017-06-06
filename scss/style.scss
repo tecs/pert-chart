@@ -290,18 +290,21 @@ html, body {
         opacity: 1;
     }
 
-    &:hover:after {
+    .edge-delete {
         position: relative;
         left: 50%;
         width: 20px;
         height: 20px;
         margin-left: -10px;
-        display: block;
-        content: "⨯";
         transform: translate(0,-50%);
         font-size: 23px;
         text-align: center;
         line-height: 20px;
         cursor: pointer;
+        color: transparent
+    }
+
+    &:hover .edge-delete {
+        color: initial;
     }
 }
