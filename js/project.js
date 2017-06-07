@@ -261,8 +261,21 @@ become a part of the requirement changes report.')) {
         }
 
         const nodes = this.config.ns('nodes');
-        const id = nodes.findFreeKey('n');
-        nodes.set(id, {});
+
+        // Make sure the new node ID does not overlap with a deleted node if the
+        // project is started.
+        const unset = [];
+        let id;
+        do {
+            id = nodes.findFreeKey('n');
+            nodes.set(id, {});
+            unset.push(id);
+
+            // Skip original node IDs
+        } while (this.isStarted && id in this.configData.original.nodes);
+
+        // Clean up
+        unset.slice(0, -1).forEach(id => nodes.unset(id));
 
         this.nodes[id] = new PERT.Node(id, nodes.ns(id), name);
 
@@ -322,7 +335,21 @@ become a part of the requirement changes report.')) {
     {
         // If no ID has been supplied, create a new placeholder resource
         if (typeof id !== 'string') {
-            id = this.config.ns('resources').findFreeKey('r');
+            const resources = this.config.ns('resources');
+
+            // Make sure the new resource ID does not overlap with a deleted
+            // resource if the project is started.
+            const unset = [];
+            do {
+                id = resources.findFreeKey('r');
+                resources.set(id, {});
+                unset.push(id);
+
+                // Skip original resource IDs
+            } while (this.isStarted && id in this.configData.original.resources);
+
+            // Clean up
+            unset.forEach(id => resources.unset(id));
         }
 
         const config = this.config.ns('resources').getData();
