@@ -32,7 +32,7 @@ PERT.Project = class Project
         const configData = this.configData;
         const projectMenu = PERT.ui('menu-contents-project');
 
-        const template = PERT.ui('templates').import.getElementById('ProjectTemplate').content;
+        const template = PERT.ui('templates').import.querySelector('#ProjectTemplate').content;
         const project = document.importNode(template, true).firstElementChild;
 
         projectMenu.innerHTML = '';
@@ -353,7 +353,7 @@ become a part of the requirement changes report.')) {
         }
 
         const config = this.config.ns('resources').getData();
-        const template = PERT.ui('templates').import.getElementById('ResourceTemplate').content;
+        const template = PERT.ui('templates').import.querySelector('#ResourceTemplate').content;
         const resource = document.importNode(template, true).firstElementChild;
 
         // Pre-fill the inputs

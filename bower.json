@@ -23,6 +23,7 @@
     "tests"
   ],
   "dependencies": {
-    "data-store": "https://github.com/tecs/data-store.git"
+    "data-store": "https://github.com/tecs/data-store.git",
+    "html-imports": "https://github.com/webcomponents/html-imports.git"
   }
 }
