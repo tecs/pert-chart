@@ -76,8 +76,23 @@ PERT.Project = class Project
         // Register pre-HTML5 drag and drop and stats hover handlers
         const projectArea = PERT.ui('area').querySelector('.project-area');
 
+        // Scrolls the project area when dragging close to the browser edge
+        const dragScroll = e => {
+            const activate = 30;
+            if (e.clientX < activate) {
+                projectArea.scrollLeft -= Math.min(e.clientX, projectArea.scrollLeft);
+            } else if (window.innerWidth - e.clientX < activate) {
+                projectArea.scrollLeft += window.innerWidth - e.clientX;
+            } else if (e.clientY < activate) {
+                projectArea.scrollTop -= Math.min(e.clientY, projectArea.scrollTop);
+            } else if (window.innerHeight - e.clientY < activate) {
+                projectArea.scrollTop += window.innerHeight - e.clientY;
+            }
+        };
+
         projectArea.addEventListener('mousemove', e => {
             if (this.moveNode) {
+                dragScroll(e);
                 this.moveNode.drag(e.clientX + projectArea.scrollLeft, e.clientY + projectArea.scrollTop);
             } else {
                 let nodeId = null;
@@ -112,6 +127,7 @@ PERT.Project = class Project
         projectArea.addEventListener('drag', e => {
             // If there's a custom redraw handler, call it
             if (e.target.redrawEdge) {
+                dragScroll(e);
                 e.target.redrawEdge(e.clientX + projectArea.scrollLeft, e.clientY + projectArea.scrollTop);
             }
         });
