@@ -6,8 +6,11 @@ PERT.Node = class Node
         this.config = configStore;
         const config = this.configData;
 
+        const newlyCreated = !this.config.keys().length;
+
         // Default configuration for new nodes
-        if (!this.config.keys().length) {
+        if (newlyCreated) {
+
             const nodes = PERT.currentProject.config.ns('nodes');
             const top = 200;
             let left = 400;
@@ -62,7 +65,11 @@ PERT.Node = class Node
         this.dateInputs[0].value = config.start;
         this.dateInputs[1].value = config.end;
 
-        PERT.ui('area').querySelector('.project-area').appendChild(node);
+        const projectArea = PERT.ui('area').querySelector('.project-area');
+        projectArea.appendChild(node);
+        if (newlyCreated) {
+            projectArea.scrollLeft = node.offsetLeft - 400;
+        }
 
         this.update();
 
