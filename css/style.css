@@ -88,7 +88,7 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 .edge { position: absolute; background: black; height: 1px; transform-origin: top left; opacity: 0.4; z-index: 2; }
 
-.edge.edge-moving { z-index: 5; opacity: 1; }
+.edge.edge-moving { pointer-events: none; z-index: 5; opacity: 1; }
 
 .edge.critical { height: 2px; opacity: 1; }
 

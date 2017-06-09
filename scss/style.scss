@@ -286,6 +286,7 @@ html, body {
     z-index: 2;
 
     &.edge-moving {
+        pointer-events: none;
         z-index: 5;
         opacity: 1;
     }
