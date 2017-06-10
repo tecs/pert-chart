@@ -38,16 +38,16 @@ PERT.Project = class Project
         projectMenu.innerHTML = '';
         projectMenu.appendChild(project);
 
-        const dates = project.querySelectorAll('.project-dates input');
-        dates[0].value = configData.start;
-        dates[1].value = configData.end;
+        this.dates = project.querySelectorAll('.project-dates input');
+        this.dates[0].value = configData.start;
+        this.dates[1].value = configData.end;
 
         if (this.isStarted) {
             project.classList.add('project-started');
         }
 
         // Date change handlers
-        dates.forEach((node, index) => {
+        this.dates.forEach((node, index) => {
             const name = index ? 'end' : 'start';
             node.addEventListener('change', e => {
                 configData[name] = e.target.value;
@@ -434,8 +434,7 @@ become a part of the requirement changes report.')) {
     recalculateDateConstraints()
     {
         // Reset the project date constraints
-        const project = PERT.ui('menu-contents-project').querySelectorAll('.project-dates input');
-        Object.assign(project[0], project[1], {min: '', max: ''});
+        Object.assign(this.dates[0], this.dates[1], {min: '', max: ''});
 
         // Reset all nodes' date constraints and find the left and rightmost
         // nodes
@@ -452,23 +451,23 @@ become a part of the requirement changes report.')) {
         }
 
         // Recalculate all node date constraints
-        left.forEach(node => node.updateDateConstraints(false, project[0].value));
-        right.forEach(node => node.updateDateConstraints(true, project[1].value));
+        left.forEach(node => node.updateDateConstraints(false, this.dates[0].value));
+        right.forEach(node => node.updateDateConstraints(true, this.dates[1].value));
 
         // Recalculate the project's date constraints
         // Set the maximum project start date to be the earliest node start time
         left.forEach(node => {
             const value = node.dateInputs[0].value || node.dateInputs[1].value || node.dateInputs[1].max;
-            if (!project[0].max || (value && project[0].max > value)) {
-                project[0].max = value;
+            if (!this.dates[0].max || (value && this.dates[0].max > value)) {
+                this.dates[0].max = value;
             }
         });
 
         // Set the minimum project end date to be the latest node end time
         right.forEach(node => {
             const value = node.dateInputs[1].value || node.dateInputs[0].value || node.dateInputs[0].min;
-            if (!project[1].min || (value && project[1].min < value)) {
-                project[1].min = value;
+            if (!this.dates[1].min || (value && this.dates[1].min < value)) {
+                this.dates[1].min = value;
             }
         });
         this.recalculateResourceConstraints();
@@ -647,17 +646,61 @@ become a part of the requirement changes report.')) {
         const resources = this.config.get('resources');
         const statArea = PERT.ui('menu-contents-project').querySelector('.project-stats');
 
-        statArea.innerHTML = '';
-        for (const key in stats) {
-            const row = document.createElement('tr');
-            [resources[key].name, stats[key]]
-                .map(value => {
-                    const td = document.createElement('td');
-                    td.innerText = value;
-                    return td;
-                })
-                .forEach(td => row.appendChild(td));
-            statArea.appendChild(row);
+        const rows = [];
+        if (nodeId) {
+            const node = this.nodes[nodeId];
+            const nodes = [node, ...node.getNeighbours(true, true)];
+            const until = node.config.get('end') || node.dateInputs[1].min;
+
+            let from = '';
+            for (const node of nodes) {
+                const min = node.config.get('start') || node.dateInputs[0].max;
+                if (!from || from > min) {
+                    from = min;
+                }
+            }
+
+            rows.push(['Name', node.config.get('name')]);
+            if (from) {
+                rows.push(['From', from]);
+            }
+            if (until) {
+                rows.push(['Until', until]);
+            }
+            rows.push(['Milestones', nodes.length]);
+        } else {
+            const until = this.config.get('end') || this.dates[1].min;
+
+            let from = this.config.get('start') || this.dates[0].max;
+            for (const key in this.nodes) {
+                const min = this.nodes[key].config.get('start') || this.nodes[key].dateInputs[0].max;
+                if (!from || from > min) {
+                    from = min;
+                }
+            }
+
+            rows.push(['Name', 'Whole project']);
+            if (from) {
+                rows.push(['From', from]);
+            }
+            if (until) {
+                rows.push(['Until', until]);
+            }
+            rows.push(['Milestones', Object.keys(this.nodes).length]);
         }
+        for (const key in stats) {
+            rows.push([resources[key].name, stats[key]]);
+        }
+
+        statArea.innerHTML = '';
+        rows.forEach(row => {
+            const rowElement = document.createElement('tr');
+            row.map(text => {
+                const td = document.createElement('td');
+                td.innerText = text;
+                return td;
+            }).forEach(td => rowElement.appendChild(td));
+            statArea.appendChild(rowElement);
+        });
     }
 };
