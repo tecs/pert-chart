@@ -32,6 +32,18 @@ const PERT = { // eslint-disable-line no-unused-vars
     },
 
     /**
+     * Creates and returns a normalized date object.
+     * @param {String} [from='']
+     * @returns {Date}
+     */
+    getDate(from)
+    {
+        const date = from ? new Date(from) : new Date();
+        date.setUTCHours(0, 0, 0, 0);
+        return date;
+    },
+
+    /**
      * A caching wrapper around `document.getElementById()`.
      * @param {String} name
      * @returns {HTMLElement}

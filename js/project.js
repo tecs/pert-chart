@@ -315,15 +315,14 @@ become a part of the requirement changes report.')) {
         this.recalculateDateConstraints();
 
         // Recalculate date advancement on the day following
-        const tomorrow = new Date();
-        tomorrow.setUTCHours(0, 0, 0, 0);
+        const tomorrow = PERT.getDate();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const interval = setInterval(() => {
             // Stop interval if the project has been unloaded
             if (PERT.currentProject !== this) {
                 clearInterval(interval);
             }
-            if (tomorrow < new Date()) {
+            if (tomorrow <= PERT.getDate()) {
                 // Bump next update to the day following
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 this.recalculateDateAdvancement();
@@ -596,8 +595,7 @@ become a part of the requirement changes report.')) {
         }
 
         // Get today's date without the time component
-        const now = new Date();
-        now.setUTCHours(0, 0, 0, 0);
+        const now = PERT.getDate();
         for (const nodeId in this.nodes) {
             const node = this.nodes[nodeId].node;
             node.classList.remove('node-past');
@@ -605,8 +603,8 @@ become a part of the requirement changes report.')) {
             node.classList.remove('node-current');
 
             const dates = this.nodes[nodeId].dateInputs;
-            const start = new Date(dates[0].value);
-            const end = new Date(dates[1].value);
+            const start = PERT.getDate(dates[0].value);
+            const end = PERT.getDate(dates[1].value);
             if (now > end) {
                 node.classList.add('node-past');
             } else if (now < start) {
