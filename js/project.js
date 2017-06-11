@@ -750,6 +750,41 @@ become a part of the requirement changes report.')) {
             }
         }
 
+        // Project resources
+        for (const key in config.original.resources) {
+            const original = config.original.resources[key];
+            if (!(key in config.resources)) {
+                output.push(`Resource '${original.name}' deleted`);
+                continue;
+            }
+
+            const current = config.resources[key];
+            const name = original.name;
+            if (original.name !== name) {
+                output.push(`Resource '${name}' renamed to '${current.name}'`);
+            }
+            const a = current.amount - original.amount;
+            if (a !== 0) {
+                output.push(`Resource '${name}' amount ${a > 0 ? 'in' : 'de'}creased by ${Math.abs(a)}'`);
+            }
+            const b = current.concurrency - original.concurrency;
+            if (b !== 0) {
+                if (!current.concurrency) {
+                    output.push(`Resource '${name}' concurrency constraint removed`);
+                } else if (!original.concurrency) {
+                    output.push(`Resource '${name}' concurrency set to ${current.concurrency}`);
+                } else {
+                    output.push(`Resource '${name}' concurrency ${b > 0 ? 'in' : 'de'}creased by ${Math.abs(b)}'`);
+                }
+            }
+        }
+
+        for (const key in config.resources) {
+            if (!(key in config.original.resources)) {
+                output.push(`Resource '${config.resources[key].name}' added`);
+            }
+        }
+
         throw 'Not implemented.';
     }
 };
