@@ -701,4 +701,55 @@ become a part of the requirement changes report.')) {
             statArea.appendChild(rowElement);
         });
     }
+
+    /**
+     * Redraws all requirement changes since the project was started.
+     */
+    redrawRequirementChanges()
+    {
+        if (!this.isStarted) {
+            return;
+        }
+
+        const config = this.configData;
+        const now = PERT.getDate();
+        const output = [];
+
+        // Project dates
+        const projectStartOffset = (PERT.getDate(config.start) - PERT.getDate(config.original.start)) / 86400000;
+        const projectEndOffset = (PERT.getDate(config.end) - PERT.getDate(config.original.end)) / 86400000;
+        const projectDuration = projectEndOffset - projectStartOffset;
+        const projectOffset = projectDuration === 0 ? projectStartOffset : 0;
+
+        if (projectOffset) {
+            output.push(`Project shifted ${projectOffset > 0 ? 'forward' : 'back'} by ${Math.abs(projectOffset)} days`);
+        } else {
+            if (projectStartOffset !== 0) {
+                const text = `${Math.abs(projectStartOffset)} days`;
+                if (now >= PERT.getDate(config.start)) {
+                    output.push(`Project started ${text} ${projectStartOffset > 0 ? 'late' : 'ahead of time'}`);
+                } else {
+                    output.push(`Project start shifted ${projectStartOffset > 0 ? 'forward' : 'back'} by ${text}`);
+                }
+            }
+            if (projectEndOffset !== 0) {
+                const text = `${Math.abs(projectEndOffset)} days`;
+                if (now >= PERT.getDate(config.end)) {
+                    output.push(`Project finished ${text} ${projectEndOffset > 0 ? 'late' : 'ahead of time'}`);
+                } else {
+                    output.push(`Project end shifted ${projectEndOffset > 0 ? 'forward' : 'back'} by ${text}`);
+                }
+            }
+        }
+        if (projectDuration !== 0) {
+            const text = `${Math.abs(projectDuration)} days`;
+            if (now >= PERT.getDate(config.end)) {
+                output.push(`Project completed ${text} ${projectDuration > 0 ? 'late' : 'ahead of time'}`);
+            } else {
+                output.push(`Project duration ${projectDuration > 0 ? 'in' : 'de'}creased by ${text}`);
+            }
+        }
+
+        throw 'Not implemented.';
+    }
 };
