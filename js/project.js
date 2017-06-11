@@ -791,6 +791,64 @@ become a part of the requirement changes report.')) {
             }
         }
 
+        // Nodes
+        for (const key in config.original.nodes) {
+            const original = config.original.nodes[key];
+            if (!(key in config.nodes)) {
+                output.push(`Milestone '${original.name}' deleted`);
+                continue;
+            }
+
+            const current = config.nodes[key];
+            const name = original.name;
+            if (current.name !== name) {
+                output.push(`Milestone '${name}' renamed to '${current.name}'`);
+            }
+            if (original.critical !== current.critical) {
+                output.push(`Milestone '${name}' set to ${current.critical ? 'critical' : 'not critical'}`);
+            }
+            const start = (PERT.getDate(current.start) - PERT.getDate(original.start)) / 86400000;
+            const end = (PERT.getDate(current.end) - PERT.getDate(original.end)) / 86400000;
+            const duration = end - start;
+            const offset = duration === 0 ? start : 0;
+
+            if (offset) {
+                const text = `${Math.abs(offset)} days`;
+                output.push(`Milestone '${name}' shifted ${offset > 0 ? 'forward' : 'back'} by ${text}`);
+            } else {
+                if (start !== 0) {
+                    const text = `${Math.abs(start)} days`;
+                    if (now >= PERT.getDate(current.start)) {
+                        output.push(`Milestone '${name}' started ${text} ${start > 0 ? 'late' : 'ahead of time'}`);
+                    } else {
+                        output.push(`Milestone '${name}' start shifted ${start > 0 ? 'forward' : 'back'} by ${text}`);
+                    }
+                }
+                if (end !== 0) {
+                    const text = `${Math.abs(end)} days`;
+                    if (now >= PERT.getDate(current.end)) {
+                        output.push(`Milestone '${name}' finished ${text} ${end > 0 ? 'late' : 'ahead of time'}`);
+                    } else {
+                        output.push(`Milestone '${name}' end shifted ${end > 0 ? 'forward' : 'back'} by ${text}`);
+                    }
+                }
+            }
+            if (duration !== 0) {
+                const text = `${Math.abs(duration)} days`;
+                if (now >= PERT.getDate(current.end)) {
+                    output.push(`Milestone '${name}' completed ${text} ${duration > 0 ? 'late' : 'ahead of time'}`);
+                } else {
+                    output.push(`Milestone '${name}' duration ${duration > 0 ? 'in' : 'de'}creased by ${text}`);
+                }
+            }
+        }
+
+        for (const key in config.nodes) {
+            if (!(key in config.original.nodes)) {
+                output.push(`Milestone '${config.nodes[key].name}' added`);
+            }
+        }
+
         throw 'Not implemented.';
     }
 };
