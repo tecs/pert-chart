@@ -665,6 +665,9 @@ become a part of the requirement changes report.')) {
             if (until) {
                 rows.push(['Until', until]);
             }
+            if (from && until) {
+                rows.push(['Duration', `${(PERT.getDate(until) - PERT.getDate(from)) / 86400000} days`]);
+            }
             rows.push(['Milestones', nodes.length]);
         } else {
             const until = this.config.get('end') || this.dates[1].min;
@@ -683,6 +686,9 @@ become a part of the requirement changes report.')) {
             }
             if (until) {
                 rows.push(['Until', until]);
+            }
+            if (from && until) {
+                rows.push(['Duration', `${(PERT.getDate(until) - PERT.getDate(from)) / 86400000} days`]);
             }
             rows.push(['Milestones', Object.keys(this.nodes).length]);
         }
