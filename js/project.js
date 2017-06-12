@@ -792,14 +792,16 @@ become a part of the requirement changes report.')) {
         }
 
         // Nodes
-        for (const key in config.original.nodes) {
-            const original = config.original.nodes[key];
-            if (!(key in config.nodes)) {
+        const nodes = config.nodes;
+        const originalNodes = config.original.nodes;
+        for (const key in originalNodes) {
+            const original = originalNodes[key];
+            if (!(key in nodes)) {
                 output.push(`Milestone '${original.name}' deleted`);
                 continue;
             }
 
-            const current = config.nodes[key];
+            const current = nodes[key];
             const name = original.name;
             if (current.name !== name) {
                 output.push(`Milestone '${name}' renamed to '${current.name}'`);
@@ -843,9 +845,9 @@ become a part of the requirement changes report.')) {
             }
         }
 
-        for (const key in config.nodes) {
-            if (!(key in config.original.nodes)) {
-                output.push(`Milestone '${config.nodes[key].name}' added`);
+        for (const key in nodes) {
+            if (!(key in originalNodes)) {
+                output.push(`Milestone '${nodes[key].name}' added`);
             }
         }
 
