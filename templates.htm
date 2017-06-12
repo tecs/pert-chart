@@ -31,6 +31,9 @@
         <div class="project-resources"></div>
         <p>Stats:</p>
         <table class="project-stats"></table>
+        <p>
+            <button class="project-changes">requirement changes report</button>
+        </p>
     </div>
 </template>
 
@@ -40,4 +43,12 @@
         <input type="number" name="amount" min="0" placeholder="amount" title="Amount" />
         <input type="number" name="concurrency" min="0" placeholder="concurrency" title="Concurrency"/>
     </div>>
+</template>
+
+<template id="PopupTemplate">
+    <div class="popup">
+        <div class="popup-background" title="Close popup"></div>
+        <div class="popup-close">&Cross;</div>
+        <div class="popup-content"></div>
+    </div>
 </template>

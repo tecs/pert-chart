@@ -18,7 +18,11 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 #menu-contents-project .project-dates input:last-child { float: right; }
 
+.project-changes { display: none; }
+
 .project-started .project-start { display: none; }
+
+.project-started .project-changes { display: block; }
 
 .menu-contents-project-loaded > button { display: inline !important; }
 
@@ -95,3 +99,11 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 .edge .edge-delete { position: relative; left: 50%; width: 20px; height: 20px; margin-left: -10px; transform: translate(0, -50%); font-size: 23px; text-align: center; line-height: 20px; cursor: pointer; color: transparent; }
 
 .edge:hover .edge-delete { color: initial; }
+
+.popup { position: absolute; width: 100%; height: 100%; z-index: 3; }
+
+.popup .popup-background { position: absolute; width: 100%; height: 100%; top: 0; left: 0; background: black; opacity: 0.6; z-index: 1; cursor: pointer; }
+
+.popup .popup-content { position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px; padding: 50px; background: white; z-index: 2; overflow: auto; }
+
+.popup .popup-close { position: absolute; width: 30px; height: 30px; top: 20px; right: 50px; pointer-events: none; background: black; color: white; font-size: 30px; text-align: center; line-height: 30px; z-index: 2; }

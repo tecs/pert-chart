@@ -71,6 +71,7 @@ PERT.Project = class Project
         project.querySelector('.project-rename').addEventListener('click', () => this.rename());
         project.querySelector('.project-delete').addEventListener('click', () => this.delete());
         project.querySelector('.project-start').addEventListener('click', () => this.start());
+        project.querySelector('.project-changes').addEventListener('click', () => this.generateRequirementChanges());
         project.querySelector('.project-add-node').addEventListener('click', () => this.addNode());
 
         // Register pre-HTML5 drag and drop and stats hover handlers
@@ -711,7 +712,7 @@ become a part of the requirement changes report.')) {
     /**
      * Redraws all requirement changes since the project was started.
      */
-    redrawRequirementChanges()
+    generateRequirementChanges()
     {
         if (!this.isStarted) {
             return;
@@ -894,6 +895,19 @@ become a part of the requirement changes report.')) {
             output.push(`Connection between '${nodes[edge.from].name}' and '${nodes[edge.to].name}' added`);
         }
 
-        throw 'Not implemented.';
+        if (!output.length) {
+            if (now >= PERT.getDate(config.end)) {
+                output.push('Everything went according to plan');
+            } else {
+                output.push('So far everything is going as planned');
+            }
+        }
+
+        // Update requirement changes
+        const template = PERT.ui('templates').import.querySelector('#PopupTemplate').content;
+        const popup = document.importNode(template, true).firstElementChild;
+        popup.querySelector('.popup-content').innerText = output.join('\n');
+        popup.querySelector('.popup-background').addEventListener('click', () => popup.parentNode.removeChild(popup));
+        document.body.appendChild(popup);
     }
 };

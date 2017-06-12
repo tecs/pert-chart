@@ -7,6 +7,7 @@ PERT chart is a browser-based PERT chart maker and viewer.
 - Resource management
 - Budget and capacity conflicts visualization
 - Statistics
+- Requirement changes reporting
 - Project import / export
 
 ## Requirements

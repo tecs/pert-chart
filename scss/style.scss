@@ -72,8 +72,18 @@ html, body {
     }
 }
 
-.project-started .project-start {
+.project-changes {
     display: none;
+}
+
+.project-started {
+    .project-start {
+        display: none;
+    }
+
+    .project-changes {
+        display: block;
+    }
 }
 
 .menu-contents-project-loaded > button {
@@ -312,5 +322,51 @@ html, body {
 
     &:hover .edge-delete {
         color: initial;
+    }
+}
+
+.popup {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+
+    .popup-background {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: black;
+        opacity: 0.6;
+        z-index: 1;
+        cursor: pointer;
+    }
+
+    .popup-content {
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        right: 50px;
+        bottom: 50px;
+        padding: 50px;
+        background: white;
+        z-index: 2;
+        overflow: auto;
+    }
+
+    .popup-close {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        top: 20px;
+        right: 50px;
+        pointer-events: none;
+        background: black;
+        color: white;
+        font-size: 30px;
+        text-align: center;
+        line-height: 30px;
+        z-index: 2;
     }
 }
