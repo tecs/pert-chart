@@ -794,6 +794,7 @@ become a part of the requirement changes report.')) {
         }
 
         // Nodes
+        const resourceDiff = {};
         const nodes = config.nodes;
         const originalNodes = config.original.nodes;
         for (const key in originalNodes) {
@@ -847,12 +848,31 @@ become a part of the requirement changes report.')) {
                     output.push(`${header} duration ${duration > 0 ? 'in' : 'de'}creased by ${text}`);
                 }
             }
+            for (const key in current.resources) {
+                if (key in original.resources && current.resources[key] !== original.resources[key]) {
+                    const text = `resource '${config.resources[key].name}'`;
+                    const diff = current.resources[key] - original.resources[key];
+                    resourceDiff[key] = key in resourceDiff ? resourceDiff[key] + diff : diff;
+                    if (now >= PERT.getDate(current.end)) {
+                        output.push(`${header} took ${Math.abs(diff)} ${diff > 0 ? 'more' : 'less'} of ${text}`);
+                    } else {
+                        output.push(`${header} ${text} ${diff > 0 ? 'in' : 'de'}creased by ${Math.abs(diff)}`);
+                    }
+                }
+            }
         }
 
         for (const key in nodes) {
             if (!(key in originalNodes)) {
                 output.push(`Milestone '${nodes[key].name}' added`);
             }
+        }
+
+        // Total resources
+        for (const key in resourceDiff) {
+            const diff = resourceDiff[key];
+            const name = config.resources[key].name;
+            output.push(`Total requirement for '${name}' ${diff > 0 ? 'in' : 'de'}creased by ${Math.abs(diff)}`);
         }
 
         // Edges
