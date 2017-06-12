@@ -766,21 +766,23 @@ become a part of the requirement changes report.')) {
 
             const current = config.resources[key];
             const name = original.name;
+            const header = `Resource '${name}'`;
+
             if (original.name !== name) {
-                output.push(`Resource '${name}' renamed to '${current.name}'`);
+                output.push(`${header} renamed to '${current.name}'`);
             }
             const a = current.amount - original.amount;
             if (a !== 0) {
-                output.push(`Resource '${name}' amount ${a > 0 ? 'in' : 'de'}creased by ${Math.abs(a)}'`);
+                output.push(`${header} amount ${a > 0 ? 'in' : 'de'}creased by ${Math.abs(a)}'`);
             }
             const b = current.concurrency - original.concurrency;
             if (b !== 0) {
                 if (!current.concurrency) {
-                    output.push(`Resource '${name}' concurrency constraint removed`);
+                    output.push(`${header} concurrency constraint removed`);
                 } else if (!original.concurrency) {
-                    output.push(`Resource '${name}' concurrency set to ${current.concurrency}`);
+                    output.push(`${header} concurrency set to ${current.concurrency}`);
                 } else {
-                    output.push(`Resource '${name}' concurrency ${b > 0 ? 'in' : 'de'}creased by ${Math.abs(b)}'`);
+                    output.push(`${header} concurrency ${b > 0 ? 'in' : 'de'}creased by ${Math.abs(b)}'`);
                 }
             }
         }
@@ -803,11 +805,13 @@ become a part of the requirement changes report.')) {
 
             const current = nodes[key];
             const name = original.name;
+            const header = `Milestone '${name}'`;
+
             if (current.name !== name) {
-                output.push(`Milestone '${name}' renamed to '${current.name}'`);
+                output.push(`${header} renamed to '${current.name}'`);
             }
             if (original.critical !== current.critical) {
-                output.push(`Milestone '${name}' set to ${current.critical ? 'critical' : 'not critical'}`);
+                output.push(`${header} set to ${current.critical ? 'critical' : 'not critical'}`);
             }
             const start = (PERT.getDate(current.start) - PERT.getDate(original.start)) / 86400000;
             const end = (PERT.getDate(current.end) - PERT.getDate(original.end)) / 86400000;
@@ -816,31 +820,31 @@ become a part of the requirement changes report.')) {
 
             if (offset) {
                 const text = `${Math.abs(offset)} days`;
-                output.push(`Milestone '${name}' shifted ${offset > 0 ? 'forward' : 'back'} by ${text}`);
+                output.push(`${header} shifted ${offset > 0 ? 'forward' : 'back'} by ${text}`);
             } else {
                 if (start !== 0) {
                     const text = `${Math.abs(start)} days`;
                     if (now >= PERT.getDate(current.start)) {
-                        output.push(`Milestone '${name}' started ${text} ${start > 0 ? 'late' : 'ahead of time'}`);
+                        output.push(`${header} started ${text} ${start > 0 ? 'late' : 'ahead of time'}`);
                     } else {
-                        output.push(`Milestone '${name}' start shifted ${start > 0 ? 'forward' : 'back'} by ${text}`);
+                        output.push(`${header} start shifted ${start > 0 ? 'forward' : 'back'} by ${text}`);
                     }
                 }
                 if (end !== 0) {
                     const text = `${Math.abs(end)} days`;
                     if (now >= PERT.getDate(current.end)) {
-                        output.push(`Milestone '${name}' finished ${text} ${end > 0 ? 'late' : 'ahead of time'}`);
+                        output.push(`${header} finished ${text} ${end > 0 ? 'late' : 'ahead of time'}`);
                     } else {
-                        output.push(`Milestone '${name}' end shifted ${end > 0 ? 'forward' : 'back'} by ${text}`);
+                        output.push(`${header} end shifted ${end > 0 ? 'forward' : 'back'} by ${text}`);
                     }
                 }
             }
             if (duration !== 0) {
                 const text = `${Math.abs(duration)} days`;
                 if (now >= PERT.getDate(current.end)) {
-                    output.push(`Milestone '${name}' completed ${text} ${duration > 0 ? 'late' : 'ahead of time'}`);
+                    output.push(`${header} completed ${text} ${duration > 0 ? 'late' : 'ahead of time'}`);
                 } else {
-                    output.push(`Milestone '${name}' duration ${duration > 0 ? 'in' : 'de'}creased by ${text}`);
+                    output.push(`${header} duration ${duration > 0 ? 'in' : 'de'}creased by ${text}`);
                 }
             }
         }
