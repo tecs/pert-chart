@@ -851,6 +851,25 @@ become a part of the requirement changes report.')) {
             }
         }
 
+        // Edges
+        const findEdge = (x, c) => Object.keys(c).findIndex(k => c[k].from === x.from && c[k].to === x.to) !== -1;
+
+        for (const key in config.original.edges) {
+            const edge = config.original.edges[key];
+            if (findEdge(edge, config.edges) || !(edge.from in nodes) || !(edge.to in nodes)) {
+                continue;
+            }
+            output.push(`Connection between '${nodes[edge.from].name}' and '${nodes[edge.to].name}' severed`);
+        }
+
+        for (const key in config.edges) {
+            const edge = config.edges[key];
+            if (findEdge(edge, config.original.edges) || !(edge.from in originalNodes) || !(edge.to in originalNodes)) {
+                continue;
+            }
+            output.push(`Connection between '${nodes[edge.from].name}' and '${nodes[edge.to].name}' added`);
+        }
+
         throw 'Not implemented.';
     }
 };
