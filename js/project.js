@@ -720,7 +720,11 @@ become a part of the requirement changes report.')) {
 
         const config = this.configData;
         const now = PERT.getDate();
-        const output = [];
+        const output = {
+            project: [],
+            resources: [],
+            nodes: {}
+        };
 
         // Project dates
         const projectStartOffset = (PERT.getDate(config.start) - PERT.getDate(config.original.start)) / 86400000;
@@ -729,31 +733,31 @@ become a part of the requirement changes report.')) {
         const projectOffset = projectDuration === 0 ? projectStartOffset : 0;
 
         if (projectOffset) {
-            output.push(`Project shifted ${projectOffset > 0 ? 'forward' : 'back'} by ${Math.abs(projectOffset)} days`);
+            output.project.push(`Shifted ${projectOffset > 0 ? 'forward' : 'back'} by ${Math.abs(projectOffset)} days`);
         } else {
             if (projectStartOffset !== 0) {
                 const text = `${Math.abs(projectStartOffset)} days`;
                 if (now >= PERT.getDate(config.start)) {
-                    output.push(`Project started ${text} ${projectStartOffset > 0 ? 'late' : 'ahead of time'}`);
+                    output.project.push(`Started ${text} ${projectStartOffset > 0 ? 'late' : 'ahead of time'}`);
                 } else {
-                    output.push(`Project start shifted ${projectStartOffset > 0 ? 'forward' : 'back'} by ${text}`);
+                    output.project.push(`Start shifted ${projectStartOffset > 0 ? 'forward' : 'back'} by ${text}`);
                 }
             }
             if (projectEndOffset !== 0) {
                 const text = `${Math.abs(projectEndOffset)} days`;
                 if (now >= PERT.getDate(config.end)) {
-                    output.push(`Project finished ${text} ${projectEndOffset > 0 ? 'late' : 'ahead of time'}`);
+                    output.project.push(`Finished ${text} ${projectEndOffset > 0 ? 'late' : 'ahead of time'}`);
                 } else {
-                    output.push(`Project end shifted ${projectEndOffset > 0 ? 'forward' : 'back'} by ${text}`);
+                    output.project.push(`End shifted ${projectEndOffset > 0 ? 'forward' : 'back'} by ${text}`);
                 }
             }
         }
         if (projectDuration !== 0) {
             const text = `${Math.abs(projectDuration)} days`;
             if (now >= PERT.getDate(config.end)) {
-                output.push(`Project completed ${text} ${projectDuration > 0 ? 'late' : 'ahead of time'}`);
+                output.project.push(`Completed ${text} ${projectDuration > 0 ? 'late' : 'ahead of time'}`);
             } else {
-                output.push(`Project duration ${projectDuration > 0 ? 'in' : 'de'}creased by ${text}`);
+                output.project.push(`Duration ${projectDuration > 0 ? 'in' : 'de'}creased by ${text}`);
             }
         }
 
@@ -761,36 +765,35 @@ become a part of the requirement changes report.')) {
         for (const key in config.original.resources) {
             const original = config.original.resources[key];
             if (!(key in config.resources)) {
-                output.push(`Resource '${original.name}' deleted`);
+                output.resources.push(`'${original.name}' deleted`);
                 continue;
             }
 
             const current = config.resources[key];
             const name = original.name;
-            const header = `Resource '${name}'`;
 
             if (original.name !== name) {
-                output.push(`${header} renamed to '${current.name}'`);
+                output.resources.push(`'${name}' renamed to '${current.name}'`);
             }
             const a = current.amount - original.amount;
             if (a !== 0) {
-                output.push(`${header} amount ${a > 0 ? 'in' : 'de'}creased by ${Math.abs(a)}'`);
+                output.resources.push(`'${name}' amount ${a > 0 ? 'in' : 'de'}creased by ${Math.abs(a)}'`);
             }
             const b = current.concurrency - original.concurrency;
             if (b !== 0) {
                 if (!current.concurrency) {
-                    output.push(`${header} concurrency constraint removed`);
+                    output.resources.push(`'${name}' concurrency constraint removed`);
                 } else if (!original.concurrency) {
-                    output.push(`${header} concurrency set to ${current.concurrency}`);
+                    output.resources.push(`'${name}' concurrency set to ${current.concurrency}`);
                 } else {
-                    output.push(`${header} concurrency ${b > 0 ? 'in' : 'de'}creased by ${Math.abs(b)}'`);
+                    output.resources.push(`'${name}' concurrency ${b > 0 ? 'in' : 'de'}creased by ${Math.abs(b)}'`);
                 }
             }
         }
 
         for (const key in config.resources) {
             if (!(key in config.original.resources)) {
-                output.push(`Resource '${config.resources[key].name}' added`);
+                output.resources.push(`'${config.resources[key].name}' added`);
             }
         }
 
@@ -798,22 +801,49 @@ become a part of the requirement changes report.')) {
         const resourceDiff = {};
         const nodes = config.nodes;
         const originalNodes = config.original.nodes;
+
+        for (const key in nodes) {
+            output.nodes[key] = [];
+            if (!(key in originalNodes)) {
+                output.nodes[key].push('Created');
+                for (const rKey in nodes[key].resources) {
+                    if (!(rKey in config.original.resources) || !nodes[key].resources[rKey]) {
+                        continue;
+                    }
+                    if (rKey in resourceDiff) {
+                        resourceDiff[rKey] += nodes[key].resources[rKey];
+                    } else {
+                        resourceDiff[rKey] = nodes[key].resources[rKey];
+                    }
+                }
+            }
+        }
+
         for (const key in originalNodes) {
             const original = originalNodes[key];
             if (!(key in nodes)) {
-                output.push(`Milestone '${original.name}' deleted`);
+                output.nodes[key] = ['Deleted'];
+                for (const rKey in originalNodes[key].resources) {
+                    if (!(rKey in config.resources) || !originalNodes[key].resources[rKey]) {
+                        continue;
+                    }
+                    if (rKey in resourceDiff) {
+                        resourceDiff[rKey] -= originalNodes[key].resources[rKey];
+                    } else {
+                        resourceDiff[rKey] = -originalNodes[key].resources[rKey];
+                    }
+                }
                 continue;
             }
 
             const current = nodes[key];
             const name = original.name;
-            const header = `Milestone '${name}'`;
 
             if (current.name !== name) {
-                output.push(`${header} renamed to '${current.name}'`);
+                output.nodes[key].push(`Renamed to '${current.name}'`);
             }
             if (original.critical !== current.critical) {
-                output.push(`${header} set to ${current.critical ? 'critical' : 'not critical'}`);
+                output.nodes[key].push(`Set ${current.critical ? 'critical' : 'not critical'}`);
             }
             const start = (PERT.getDate(current.start) - PERT.getDate(original.start)) / 86400000;
             const end = (PERT.getDate(current.end) - PERT.getDate(original.end)) / 86400000;
@@ -822,50 +852,44 @@ become a part of the requirement changes report.')) {
 
             if (offset) {
                 const text = `${Math.abs(offset)} days`;
-                output.push(`${header} shifted ${offset > 0 ? 'forward' : 'back'} by ${text}`);
+                output.nodes[key].push(`Shifted ${offset > 0 ? 'forward' : 'back'} by ${text}`);
             } else {
                 if (start !== 0) {
                     const text = `${Math.abs(start)} days`;
                     if (now >= PERT.getDate(current.start)) {
-                        output.push(`${header} started ${text} ${start > 0 ? 'late' : 'ahead of time'}`);
+                        output.nodes[key].push(`Started ${text} ${start > 0 ? 'late' : 'ahead of time'}`);
                     } else {
-                        output.push(`${header} start shifted ${start > 0 ? 'forward' : 'back'} by ${text}`);
+                        output.nodes[key].push(`Start shifted ${start > 0 ? 'forward' : 'back'} by ${text}`);
                     }
                 }
                 if (end !== 0) {
                     const text = `${Math.abs(end)} days`;
                     if (now >= PERT.getDate(current.end)) {
-                        output.push(`${header} finished ${text} ${end > 0 ? 'late' : 'ahead of time'}`);
+                        output.nodes[key].push(`Finished ${text} ${end > 0 ? 'late' : 'ahead of time'}`);
                     } else {
-                        output.push(`${header} end shifted ${end > 0 ? 'forward' : 'back'} by ${text}`);
+                        output.nodes[key].push(`'End shifted ${end > 0 ? 'forward' : 'back'} by ${text}`);
                     }
                 }
             }
             if (duration !== 0) {
                 const text = `${Math.abs(duration)} days`;
                 if (now >= PERT.getDate(current.end)) {
-                    output.push(`${header} completed ${text} ${duration > 0 ? 'late' : 'ahead of time'}`);
+                    output.nodes[key].push(`Completed ${text} ${duration > 0 ? 'late' : 'ahead of time'}`);
                 } else {
-                    output.push(`${header} duration ${duration > 0 ? 'in' : 'de'}creased by ${text}`);
+                    output.nodes[key].push(`Duration ${duration > 0 ? 'in' : 'de'}creased by ${text}`);
                 }
             }
-            for (const key in current.resources) {
-                if (key in original.resources && current.resources[key] !== original.resources[key]) {
-                    const text = `resource '${config.resources[key].name}'`;
-                    const diff = current.resources[key] - original.resources[key];
-                    resourceDiff[key] = key in resourceDiff ? resourceDiff[key] + diff : diff;
+            for (const rKey in current.resources) {
+                if (rKey in original.resources && current.resources[rKey] !== original.resources[rKey]) {
+                    const text = `resource '${config.resources[rKey].name}'`;
+                    const diff = current.resources[rKey] - original.resources[rKey];
+                    resourceDiff[rKey] = rKey in resourceDiff ? resourceDiff[rKey] + diff : diff;
                     if (now >= PERT.getDate(current.end)) {
-                        output.push(`${header} took ${Math.abs(diff)} ${diff > 0 ? 'more' : 'less'} of ${text}`);
+                        output.nodes[key].push(`'Took ${Math.abs(diff)} ${diff > 0 ? 'more' : 'less'} of ${text}`);
                     } else {
-                        output.push(`${header} ${text} ${diff > 0 ? 'in' : 'de'}creased by ${Math.abs(diff)}`);
+                        output.nodes[key].push(`${diff > 0 ? 'In' : 'De'}creased ${text} by ${Math.abs(diff)}`);
                     }
                 }
-            }
-        }
-
-        for (const key in nodes) {
-            if (!(key in originalNodes)) {
-                output.push(`Milestone '${nodes[key].name}' added`);
             }
         }
 
@@ -873,7 +897,7 @@ become a part of the requirement changes report.')) {
         for (const key in resourceDiff) {
             const diff = resourceDiff[key];
             const name = config.resources[key].name;
-            output.push(`Total requirement for '${name}' ${diff > 0 ? 'in' : 'de'}creased by ${Math.abs(diff)}`);
+            output.project.push(`Total for '${name}' ${diff > 0 ? 'in' : 'de'}creased by ${Math.abs(diff)}`);
         }
 
         // Edges
@@ -884,7 +908,7 @@ become a part of the requirement changes report.')) {
             if (findEdge(edge, config.edges) || !(edge.from in nodes) || !(edge.to in nodes)) {
                 continue;
             }
-            output.push(`Connection between '${nodes[edge.from].name}' and '${nodes[edge.to].name}' severed`);
+            output.nodes[edge.from].push(`Connection to '${nodes[edge.to].name}' severed`);
         }
 
         for (const key in config.edges) {
@@ -892,21 +916,41 @@ become a part of the requirement changes report.')) {
             if (findEdge(edge, config.original.edges) || !(edge.from in originalNodes) || !(edge.to in originalNodes)) {
                 continue;
             }
-            output.push(`Connection between '${nodes[edge.from].name}' and '${nodes[edge.to].name}' added`);
-        }
-
-        if (!output.length) {
-            if (now >= PERT.getDate(config.end)) {
-                output.push('Everything went according to plan');
-            } else {
-                output.push('So far everything is going as planned');
-            }
+            output.nodes[edge.from].push(`Connected to '${nodes[edge.to].name}'`);
         }
 
         // Update requirement changes
-        const template = PERT.ui('templates').import.querySelector('#PopupTemplate').content;
-        const popup = document.importNode(template, true).firstElementChild;
-        popup.querySelector('.popup-content').innerText = output.join('\n');
+        const popupTemplate = PERT.ui('templates').import.querySelector('#PopupTemplate').content;
+        const popup = document.importNode(popupTemplate, true).firstElementChild;
+        const reportTemplate = PERT.ui('templates').import.querySelector('#ReportTemplate').content;
+        const report = document.importNode(reportTemplate, true).firstElementChild;
+
+        const okText = `Everything ${now >= PERT.getDate(config.end) ? 'went' : 'is going'} according to plan`;
+
+        report.querySelector('h1').innerText = this.name;
+        report.querySelector('.project-report-project').innerText = output.project.join('\n') || okText;
+        report.querySelector('.project-report-resources').innerText = output.resources.join('\n') || okText;
+
+        const nodesReport = report.querySelector('.project-report-nodes');
+
+        let changed = false;
+        for (const key in output.nodes) {
+            if (!output.nodes[key].length) {
+                continue;
+            }
+            changed = true;
+            const h3 = document.createElement('h3');
+            h3.innerHTML = key in config.original.nodes ? config.original.nodes[key].name : config.nodes[key].name;
+            const p = document.createElement('p');
+            p.innerHTML = output.nodes[key].join('\n');
+            nodesReport.appendChild(h3);
+            nodesReport.appendChild(p);
+        }
+        if (!changed) {
+            nodesReport.innerText = okText;
+        }
+
+        popup.querySelector('.popup-content').appendChild(report);
         popup.querySelector('.popup-background').addEventListener('click', () => popup.parentNode.removeChild(popup));
         document.body.appendChild(popup);
     }
