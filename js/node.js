@@ -37,8 +37,7 @@ PERT.Node = class Node
         this.neighbours = {back: {}, forward: {}};
 
         // Setup node UI
-        const template = PERT.ui('templates').import.querySelector('#NodeTemplate').content;
-        const node = document.importNode(template, true).firstElementChild;
+        const node = PERT.template('NodeTemplate');
         this.node = node;
 
         node.id = id;

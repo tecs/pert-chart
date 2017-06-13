@@ -32,8 +32,7 @@ PERT.Project = class Project
         const configData = this.configData;
         const projectMenu = PERT.ui('menu-contents-project');
 
-        const template = PERT.ui('templates').import.querySelector('#ProjectTemplate').content;
-        const project = document.importNode(template, true).firstElementChild;
+        const project = PERT.template('ProjectTemplate');
 
         projectMenu.innerHTML = '';
         projectMenu.appendChild(project);
@@ -369,8 +368,7 @@ become a part of the requirement changes report.')) {
         }
 
         const config = this.config.ns('resources').getData();
-        const template = PERT.ui('templates').import.querySelector('#ResourceTemplate').content;
-        const resource = document.importNode(template, true).firstElementChild;
+        const resource = PERT.template('ResourceTemplate');
 
         // Pre-fill the inputs
         const inputs = resource.querySelectorAll('input');
@@ -920,10 +918,8 @@ become a part of the requirement changes report.')) {
         }
 
         // Update requirement changes
-        const popupTemplate = PERT.ui('templates').import.querySelector('#PopupTemplate').content;
-        const popup = document.importNode(popupTemplate, true).firstElementChild;
-        const reportTemplate = PERT.ui('templates').import.querySelector('#ReportTemplate').content;
-        const report = document.importNode(reportTemplate, true).firstElementChild;
+        const popup = PERT.template('PopupTemplate');
+        const report = PERT.template('ReportTemplate');
 
         const okText = `Everything ${now >= PERT.getDate(config.end) ? 'went' : 'is going'} according to plan`;
 

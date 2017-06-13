@@ -56,5 +56,16 @@ const PERT = { // eslint-disable-line no-unused-vars
             }
             return cache[name];
         };
-    })()
+    })(),
+
+    /**
+     * Instantiates and returns the specified template.
+     * @param {String} name
+     * @returns {HTMLElement}
+     */
+    template(name)
+    {
+        const template = PERT.ui('templates').import.querySelector(`#${name}`).content;
+        return document.importNode(template, true).firstElementChild;
+    }
 };
