@@ -18,6 +18,8 @@ html, body { padding: 0; margin: 0; width: 100%; height: 100%; background: #FAFA
 
 #menu-contents-project .project-dates input:last-child { float: right; }
 
+#menu-contents-project .project-timezone { width: 200px; }
+
 .project-changes { display: none; }
 
 .project-started .project-start { display: none; }

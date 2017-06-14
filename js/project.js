@@ -25,6 +25,9 @@ PERT.Project = class Project
         this.dates[0].value = configData.start;
         this.dates[1].value = configData.end;
 
+        const timezone = project.querySelector('.project-timezone');
+        timezone.value = configData.timezone;
+
         if (this.isStarted) {
             project.classList.add('project-started');
         }
@@ -36,6 +39,12 @@ PERT.Project = class Project
                 configData[name] = e.target.value;
                 this.recalculateDateConstraints();
             });
+        });
+
+        // Timezone change handler
+        timezone.addEventListener('change', e => {
+            configData.timezone = parseInt(e.target.options[e.target.selectedIndex].value);
+            this.recalculateDateAdvancement();
         });
 
         // Generate project resources
@@ -299,14 +308,14 @@ become a part of the requirement changes report.')) {
         this.recalculateDateConstraints();
 
         // Recalculate date advancement on the day following
-        const tomorrow = PERT.getDate();
+        const tomorrow = this.getDate();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const interval = setInterval(() => {
             // Stop interval if the project has been unloaded
             if (PERT.currentProject !== this) {
                 clearInterval(interval);
             }
-            if (tomorrow <= PERT.getDate()) {
+            if (tomorrow <= this.getDate()) {
                 // Bump next update to the day following
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 this.recalculateDateAdvancement();
@@ -578,7 +587,7 @@ become a part of the requirement changes report.')) {
         }
 
         // Get today's date without the time component
-        const now = PERT.getDate();
+        const now = this.getDate();
         for (const nodeId in this.nodes) {
             const node = this.nodes[nodeId].node;
             node.classList.remove('node-past');
@@ -586,8 +595,8 @@ become a part of the requirement changes report.')) {
             node.classList.remove('node-current');
 
             const dates = this.nodes[nodeId].dateInputs;
-            const start = PERT.getDate(dates[0].value);
-            const end = PERT.getDate(dates[1].value);
+            const start = this.getDate(dates[0].value);
+            const end = this.getDate(dates[1].value);
             if (now > end) {
                 node.classList.add('node-past');
             } else if (now < start) {
@@ -649,7 +658,7 @@ become a part of the requirement changes report.')) {
                 rows.push(['Until', until]);
             }
             if (from && until) {
-                rows.push(['Duration', `${(PERT.getDate(until) - PERT.getDate(from)) / 86400000} days`]);
+                rows.push(['Duration', `${Math.round((this.getDate(until) - this.getDate(from)) / 86400000)} days`]);
             }
             rows.push(['Milestones', nodes.length]);
         } else {
@@ -671,7 +680,7 @@ become a part of the requirement changes report.')) {
                 rows.push(['Until', until]);
             }
             if (from && until) {
-                rows.push(['Duration', `${(PERT.getDate(until) - PERT.getDate(from)) / 86400000} days`]);
+                rows.push(['Duration', `${(this.getDate(until) - this.getDate(from)) / 86400000} days`]);
             }
             rows.push(['Milestones', Object.keys(this.nodes).length]);
         }
@@ -701,7 +710,7 @@ become a part of the requirement changes report.')) {
         }
 
         const config = this.configData;
-        const now = PERT.getDate();
+        const now = this.getDate();
         const output = {
             project: [],
             resources: [],
@@ -709,8 +718,8 @@ become a part of the requirement changes report.')) {
         };
 
         // Project dates
-        const projectStartOffset = (PERT.getDate(config.start) - PERT.getDate(config.original.start)) / 86400000;
-        const projectEndOffset = (PERT.getDate(config.end) - PERT.getDate(config.original.end)) / 86400000;
+        const projectStartOffset = (this.getDate(config.start) - this.getDate(config.original.start)) / 86400000;
+        const projectEndOffset = (this.getDate(config.end) - this.getDate(config.original.end)) / 86400000;
         const projectDuration = projectEndOffset - projectStartOffset;
         const projectOffset = projectDuration === 0 ? projectStartOffset : 0;
 
@@ -719,7 +728,7 @@ become a part of the requirement changes report.')) {
         } else {
             if (projectStartOffset !== 0) {
                 const text = `${Math.abs(projectStartOffset)} days`;
-                if (now >= PERT.getDate(config.start)) {
+                if (now >= this.getDate(config.start)) {
                     output.project.push(`Started ${text} ${projectStartOffset > 0 ? 'late' : 'ahead of time'}`);
                 } else {
                     output.project.push(`Start shifted ${projectStartOffset > 0 ? 'forward' : 'back'} by ${text}`);
@@ -727,7 +736,7 @@ become a part of the requirement changes report.')) {
             }
             if (projectEndOffset !== 0) {
                 const text = `${Math.abs(projectEndOffset)} days`;
-                if (now >= PERT.getDate(config.end)) {
+                if (now >= this.getDate(config.end)) {
                     output.project.push(`Finished ${text} ${projectEndOffset > 0 ? 'late' : 'ahead of time'}`);
                 } else {
                     output.project.push(`End shifted ${projectEndOffset > 0 ? 'forward' : 'back'} by ${text}`);
@@ -736,7 +745,7 @@ become a part of the requirement changes report.')) {
         }
         if (projectDuration !== 0) {
             const text = `${Math.abs(projectDuration)} days`;
-            if (now >= PERT.getDate(config.end)) {
+            if (now >= this.getDate(config.end)) {
                 output.project.push(`Completed ${text} ${projectDuration > 0 ? 'late' : 'ahead of time'}`);
             } else {
                 output.project.push(`Duration ${projectDuration > 0 ? 'in' : 'de'}creased by ${text}`);
@@ -827,8 +836,8 @@ become a part of the requirement changes report.')) {
             if (original.critical !== current.critical) {
                 output.nodes[key].push(`Set ${current.critical ? 'critical' : 'not critical'}`);
             }
-            const start = (PERT.getDate(current.start) - PERT.getDate(original.start)) / 86400000;
-            const end = (PERT.getDate(current.end) - PERT.getDate(original.end)) / 86400000;
+            const start = (this.getDate(current.start) - this.getDate(original.start)) / 86400000;
+            const end = (this.getDate(current.end) - this.getDate(original.end)) / 86400000;
             const duration = end - start;
             const offset = duration === 0 ? start : 0;
 
@@ -838,7 +847,7 @@ become a part of the requirement changes report.')) {
             } else {
                 if (start !== 0) {
                     const text = `${Math.abs(start)} days`;
-                    if (now >= PERT.getDate(current.start)) {
+                    if (now >= this.getDate(current.start)) {
                         output.nodes[key].push(`Started ${text} ${start > 0 ? 'late' : 'ahead of time'}`);
                     } else {
                         output.nodes[key].push(`Start shifted ${start > 0 ? 'forward' : 'back'} by ${text}`);
@@ -846,7 +855,7 @@ become a part of the requirement changes report.')) {
                 }
                 if (end !== 0) {
                     const text = `${Math.abs(end)} days`;
-                    if (now >= PERT.getDate(current.end)) {
+                    if (now >= this.getDate(current.end)) {
                         output.nodes[key].push(`Finished ${text} ${end > 0 ? 'late' : 'ahead of time'}`);
                     } else {
                         output.nodes[key].push(`'End shifted ${end > 0 ? 'forward' : 'back'} by ${text}`);
@@ -855,7 +864,7 @@ become a part of the requirement changes report.')) {
             }
             if (duration !== 0) {
                 const text = `${Math.abs(duration)} days`;
-                if (now >= PERT.getDate(current.end)) {
+                if (now >= this.getDate(current.end)) {
                     output.nodes[key].push(`Completed ${text} ${duration > 0 ? 'late' : 'ahead of time'}`);
                 } else {
                     output.nodes[key].push(`Duration ${duration > 0 ? 'in' : 'de'}creased by ${text}`);
@@ -866,7 +875,7 @@ become a part of the requirement changes report.')) {
                     const text = `resource '${config.resources[rKey].name}'`;
                     const diff = current.resources[rKey] - original.resources[rKey];
                     resourceDiff[rKey] = rKey in resourceDiff ? resourceDiff[rKey] + diff : diff;
-                    if (now >= PERT.getDate(current.end)) {
+                    if (now >= this.getDate(current.end)) {
                         output.nodes[key].push(`'Took ${Math.abs(diff)} ${diff > 0 ? 'more' : 'less'} of ${text}`);
                     } else {
                         output.nodes[key].push(`${diff > 0 ? 'In' : 'De'}creased ${text} by ${Math.abs(diff)}`);
@@ -905,7 +914,7 @@ become a part of the requirement changes report.')) {
         const popup = PERT.template('PopupTemplate');
         const report = PERT.template('ReportTemplate');
 
-        const okText = `Everything ${now >= PERT.getDate(config.end) ? 'went' : 'is going'} according to plan`;
+        const okText = `Everything ${now >= this.getDate(config.end) ? 'went' : 'is going'} according to plan`;
 
         report.querySelector('h1').innerText = this.name;
         report.querySelector('.project-report-project').innerText = output.project.join('\n') || okText;
@@ -946,6 +955,13 @@ become a part of the requirement changes report.')) {
             case PERT.version:
                 // Nothing to do here
                 break;
+
+            case 1:
+                config.set('timezone', 0);
+
+                config.set('version', PERT.version);
+                break;
+
             default:
                 // Default configuration for new projects
                 Object.assign(config.getData(), {
@@ -959,9 +975,22 @@ become a part of the requirement changes report.')) {
                     },
                     start: '',
                     end: '',
+                    timezone: 0,
                     version: PERT.version
                 });
         }
         return config;
+    }
+
+    /**
+     * A wrapper around PERT.getDate(), that injects the project's timezone into
+     * the arguments.
+     * @param {String} [from='']
+     * @param {Boolean} [time=false]
+     * @returns {Date}
+     */
+    getDate(from, time)
+    {
+        return PERT.getDate(this.config.get('timezone'), from, time);
     }
 };

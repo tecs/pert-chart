@@ -2,7 +2,7 @@ const PERT = { // eslint-disable-line no-unused-vars
     config: new DataStore('pert'),
     currentProject: null,
     currentStats: null,
-    version: 1,
+    version: 2,
 
     /**
      * Rounds the supplied number to the nearest provided decimal.
@@ -34,15 +34,20 @@ const PERT = { // eslint-disable-line no-unused-vars
 
     /**
      * Creates and returns a normalized date object.
+     * @param {Number} timezoneOffset
      * @param {String} [from='']
      * @param {Boolean} [time=false]
      * @returns {Date}
      */
-    getDate(from, time)
+    getDate(timezoneOffset, from, time)
     {
         const date = from ? new Date(from) : new Date();
+        if (!from) {
+            // Convert local to target timezone
+            date.setTime(date.getTime() + (date.getTimezoneOffset() + timezoneOffset) * 60 * 1000);
+        }
         if (!time) {
-            date.setUTCHours(0, 0, 0, 0);
+            date.setHours(0, 0, 0, 0);
         }
         return date;
     },
