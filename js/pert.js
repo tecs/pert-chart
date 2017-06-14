@@ -2,6 +2,7 @@ const PERT = { // eslint-disable-line no-unused-vars
     config: new DataStore('pert'),
     currentProject: null,
     currentStats: null,
+    version: 1,
 
     /**
      * Rounds the supplied number to the nearest provided decimal.

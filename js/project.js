@@ -942,10 +942,8 @@ become a part of the requirement changes report.')) {
      */
     static migrate(config)
     {
-        const version = 1;
-
         switch (config.get('version')) {
-            case version:
+            case PERT.version:
                 // Nothing to do here
                 break;
             default:
@@ -961,7 +959,7 @@ become a part of the requirement changes report.')) {
                     },
                     start: '',
                     end: '',
-                    version
+                    version: PERT.version
                 });
         }
         return config;
