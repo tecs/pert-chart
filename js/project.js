@@ -7,23 +7,7 @@ PERT.Project = class Project
     constructor(name, config)
     {
         this.name = name;
-        this.config = config;
-
-        // Default configuration for new projects
-        if (!this.config.keys().length) {
-            Object.assign(this.configData, {
-                resources: {},
-                nodes: {},
-                edges: {},
-                stats: {
-                    accessedAt: null,
-                    modifiedAt: null,
-                    createdAt: Date.now()
-                },
-                start: '',
-                end: ''
-            });
-        }
+        this.config = Project.migrate(config);
 
         // Setup project UI
         PERT.ui('area').innerHTML = '<div class="project-area"></div>';
@@ -949,5 +933,37 @@ become a part of the requirement changes report.')) {
         popup.querySelector('.popup-content').appendChild(report);
         popup.querySelector('.popup-background').addEventListener('click', () => popup.parentNode.removeChild(popup));
         document.body.appendChild(popup);
+    }
+
+    /**
+     * Automatically migrates the provided configuration to the latest version.
+     * @param {DataStore} config
+     * @returns {DataStore}
+     */
+    static migrate(config)
+    {
+        const version = 1;
+
+        switch (config.get('version')) {
+            case version:
+                // Nothing to do here
+                break;
+            default:
+                // Default configuration for new projects
+                Object.assign(config.getData(), {
+                    resources: {},
+                    nodes: {},
+                    edges: {},
+                    stats: {
+                        accessedAt: null,
+                        modifiedAt: null,
+                        createdAt: Date.now()
+                    },
+                    start: '',
+                    end: '',
+                    version
+                });
+        }
+        return config;
     }
 };
