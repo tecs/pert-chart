@@ -45,7 +45,7 @@ PERT.Project = class Project
         this.createResourceInputs();
 
         // Update the last accessed project timestamp
-        this.configData.stats.accessedAt = PERT.getDate();
+        this.configData.stats.accessedAt = PERT.getDate(null, true).getTime();
         this.save();
 
         // Register UI button handlers
@@ -162,7 +162,7 @@ PERT.Project = class Project
             alert('Started projects must have their dates and all their nodes\' start and end dates set to be saved.');
             return;
         }
-        this.config.get('stats').modifiedAt = PERT.getDate();
+        this.config.get('stats').modifiedAt = PERT.getDate(null, true).getTime();
         this.config.commit();
     }
 
@@ -955,7 +955,7 @@ become a part of the requirement changes report.')) {
                     stats: {
                         accessedAt: null,
                         modifiedAt: null,
-                        createdAt: PERT.getDate()
+                        createdAt: PERT.getDate(null, true).getTime()
                     },
                     start: '',
                     end: '',

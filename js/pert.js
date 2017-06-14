@@ -35,12 +35,15 @@ const PERT = { // eslint-disable-line no-unused-vars
     /**
      * Creates and returns a normalized date object.
      * @param {String} [from='']
+     * @param {Boolean} [time=false]
      * @returns {Date}
      */
-    getDate(from)
+    getDate(from, time)
     {
         const date = from ? new Date(from) : new Date();
-        date.setUTCHours(0, 0, 0, 0);
+        if (!time) {
+            date.setUTCHours(0, 0, 0, 0);
+        }
         return date;
     },
 
