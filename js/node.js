@@ -87,7 +87,7 @@ PERT.Node = class Node
 
         // Edge drag handlers
         node.addEventListener('dragover', e => {
-            const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeId').pop();
+            const originalId = e.dataTransfer.types.filter(v => v !== 'id' && v !== 'edgeid').pop();
 
             // Prevent same the source and target
             if (originalId === id) {
@@ -126,7 +126,7 @@ PERT.Node = class Node
 
         node.addEventListener('drop', e => {
             const from = e.dataTransfer.getData('id');
-            const edgeId = e.dataTransfer.getData('edgeId');
+            const edgeId = e.dataTransfer.getData('edgeid');
             PERT.currentProject.config.ns('edges').set(edgeId, {from, to: id});
             PERT.currentProject.nodes[from].connect(edgeId, PERT.currentProject.nodes[id]);
             PERT.currentProject.recalculateDateConstraints();
@@ -137,7 +137,7 @@ PERT.Node = class Node
             e.dataTransfer.dropEffect = 'move';
             e.dataTransfer.setData(id, id);
             e.dataTransfer.setData('id', id);
-            e.dataTransfer.setData('edgeId', edgeId);
+            e.dataTransfer.setData('edgeid', edgeId);
             e.dataTransfer.setDragImage(new Image(), 0, 0);
 
             // Append a custom edge redraw handler
