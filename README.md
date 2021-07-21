@@ -20,6 +20,7 @@ Installing PERT chart is as easy as running:
 ```sh
 npm install
 bower install
+npm run build
 ```
 
 If you plan on running it with Node's `http-server` (see next section), make sure it has been installed first:
@@ -34,7 +35,7 @@ Node's `http-server`:
 
 ```sh
 # inside the root of the project directory
-http-server
+http-server public
 
 # or alternatively
 npm start
