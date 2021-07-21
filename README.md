@@ -10,6 +10,18 @@ PERT chart is a browser-based PERT chart maker and viewer.
 - Requirement changes reporting
 - Project import / export
 
+## Using with Docker
+To use with Docker simply build and run the image:
+```sh
+# Build the image
+sudo docker build -t pert-chart .
+
+# Run
+sudo docker run -d pert-chart
+```
+
+By default the app is hosted on port 80 of the container - to bind it to a port on the host, e.g 8080, add the `-p 8080:80` option to the `docker run` command.
+
 ## Requirements
 - `npm` (from Node) for installation.
 - Chrome 49 or newer, Opera 36 or newer (support for Firefox, Safari, IE and Edge is underway)
@@ -40,3 +52,4 @@ http-server public
 # or alternatively
 npm start
 ```
+
