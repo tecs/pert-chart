@@ -8,8 +8,8 @@ PERT.templates = Object.entries({
             <div class="node-edge" draggable="true" title="Connect">&Rarr;</div>
             <table class="node-resources"></table>
             <div class="node-dates">
-                <input type="date" placeholder="YYYY-MM-DD" pattern="\d{4}(-\d{2}){2}" title="Start" />
-                <input type="date" placeholder="YYYY-MM-DD" pattern="\d{4}(-\d{2}){2}" title="End" />
+                <input type="date" placeholder="YYYY-MM-DD" pattern="\\d{4}(-\\d{2}){2}" title="Start" />
+                <input type="date" placeholder="YYYY-MM-DD" pattern="\\d{4}(-\\d{2}){2}" title="End" />
             </div>
         </div>
     `,
@@ -24,8 +24,8 @@ PERT.templates = Object.entries({
             <button class="project-add-node">add new milestone</button>
             <br /> <br />
             <div class="project-dates">
-                <input type="date" placeholder="YYYY-MM-DD" pattern="\d{4}(-\d{2}){2}" title="Start" />
-                <input type="date" placeholder="YYYY-MM-DD" pattern="\d{4}(-\d{2}){2}" title="End" />
+                <input type="date" placeholder="YYYY-MM-DD" pattern="\\d{4}(-\\d{2}){2}" title="Start" />
+                <input type="date" placeholder="YYYY-MM-DD" pattern="\\d{4}(-\\d{2}){2}" title="End" />
             </div>
             <br />
             Timezone:
