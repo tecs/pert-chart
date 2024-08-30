@@ -26,11 +26,9 @@
   },
   "homepage": "https://github.com/tecs/pert-chart#readme",
   "devDependencies": {
+    "data-store": "github:tecs/data-store",
     "gulp": "^5.0.0",
     "gulp-sass": "^5.1.0",
     "sass": "^1.77.8"
-  },
-  "dependencies": {
-    "bower": "^1.8.14"
   }
 }

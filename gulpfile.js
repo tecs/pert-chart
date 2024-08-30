@@ -12,10 +12,12 @@ const sass = () => {
 };
 
 const html = () => gulp.src('src/html/*').pipe(gulp.dest('public'));
-const js = () => gulp.src('src/js/*').pipe(gulp.dest('public/js'));
-const build = gulp.series(sass, html, js);
-const watch = () => gulp.watch('src/*', gulp.series(build));
+const js = gulp.parallel(
+    () => gulp.src('src/js/*').pipe(gulp.dest('public/js')),
+    () => gulp.src('node_modules/data-store/**/*').pipe(gulp.dest('public/js/data-store')),
+);
+const build = gulp.parallel(sass, html, js);
+const watch = () => gulp.watch('src/*', build);
 
 exports.watch = watch;
 exports.default = build;
-

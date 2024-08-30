@@ -31,7 +31,6 @@ By default the app is hosted on port 80 of the container - to bind it to a port 
 Installing PERT chart is as easy as running:
 ```sh
 npm install
-bower install
 npm run build
 ```
 
@@ -52,4 +51,3 @@ http-server public
 # or alternatively
 npm start
 ```
-
