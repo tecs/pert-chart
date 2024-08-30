@@ -196,8 +196,4 @@ PERT.Dashboard = class Dashboard
     }
 };
 
-if (window.HTMLImports.useNative) {
-    window.onload = () => PERT.Dashboard.initializeUi();
-} else {
-    window.HTMLImports.whenReady(() => PERT.Dashboard.initializeUi());
-}
+window.addEventListener('load', () => PERT.Dashboard.initializeUi());

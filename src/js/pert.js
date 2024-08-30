@@ -74,7 +74,6 @@ const PERT = { // eslint-disable-line no-unused-vars
      */
     template(name)
     {
-        const template = PERT.ui('templates').import.querySelector(`#${name}`).content;
-        return document.importNode(template, true).firstElementChild;
+        return PERT.templates[name].cloneNode(true);
     }
 };
