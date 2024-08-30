@@ -25,11 +25,12 @@
     "url": "https://github.com/tecs/pert-chart/issues"
   },
   "homepage": "https://github.com/tecs/pert-chart#readme",
-  "dependencies": {
-    "bower": "^1.8.0"
-  },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-sass": "^3.1.0"
+    "gulp": "^5.0.0",
+    "gulp-sass": "^5.1.0",
+    "sass": "^1.77.8"
+  },
+  "dependencies": {
+    "bower": "^1.8.14"
   }
 }

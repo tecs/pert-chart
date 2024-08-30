@@ -1,20 +1,21 @@
 const gulp = require('gulp');
-const sass = require('gulp-sass');
+const gulpSass = require('gulp-sass')(require('sass'));
 const fs = require('fs');
 
-gulp.task('default', ['sass', 'html', 'js']);
-
-gulp.task('sass', () => {
+const sass = () => {
     if (fs.existsSync('public/css/style.css')) {
         fs.unlinkSync('public/css/style.css');
     }
-    return gulp.src('scss/*.scss')
-        .pipe(sass({outputStyle: 'compact'})
-        .on('error', sass.logError))
+    return gulp.src('src/scss/*.scss')
+        .pipe(gulpSass({outputStyle: 'compressed'}).on('error', gulpSass.logError))
         .pipe(gulp.dest('public/css'));
-});
+};
 
-gulp.task('html', () => gulp.src('html/*').pipe(gulp.dest('public')));
-gulp.task('js', () => gulp.src('js/*').pipe(gulp.dest('public/js')));
+const html = () => gulp.src('src/html/*').pipe(gulp.dest('public'));
+const js = () => gulp.src('src/js/*').pipe(gulp.dest('public/js'));
+const build = gulp.series(sass, html, js);
+const watch = () => gulp.watch('src/*', gulp.series(build));
 
-gulp.task('watch', () => { gulp.watch('src/*', ['default']); });
+exports.watch = watch;
+exports.default = build;
+
