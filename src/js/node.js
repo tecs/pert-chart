@@ -143,7 +143,7 @@ PERT.Node = class Node
 
             // Append a custom edge redraw handler
             e.target.redrawEdge = (x, y) => {
-                const edge = PERT.currentProject.nodes[id].createEdge(x, y, edgeId);
+                const edge = PERT.currentProject.nodes[id].createEdge({ configData: { left: x, top: y }, node: { clientWidth: 0, clientHeight: 0 } }, edgeId);
                 edge.classList.add('edge-moving');
                 if (!node.newEdge) {
                     node.newEdge = edge;
@@ -340,7 +340,7 @@ PERT.Node = class Node
 
         if (x2 <= x1) {
             y1 = this.config.get('top') + this.node.clientHeight;
-            x1 = this.config.get('left') + otherNode.node.clientWidth / 2;
+            x1 = this.config.get('left') + this.node.clientWidth / 2;
 
             if (y1 > y2) {
                 y1 = this.config.get('top');
