@@ -34,6 +34,7 @@ PERT.Node = class Node
             });
         }
 
+        /** @type {{ back: Record<string, Node>, forward: Record<string, Node> }} */
         this.neighbours = {back: {}, forward: {}};
 
         // Setup node UI
@@ -314,17 +315,37 @@ PERT.Node = class Node
     }
 
     /**
-     * Creates or updates the supplied edge, with the given coordinates,
+     * Creates or updates the supplied edge to the supplied Node,
      * returning its HTML element.
-     * @param {Number} x2
-     * @param {Number} y2
+     * @param {Node} otherNode
      * @param {String} [id]
      * @returns {HTMLDivElement}
      */
-    createEdge(x2, y2, id)
+    createEdge(otherNode, id)
     {
-        const x1 = this.config.get('left') + this.node.clientWidth;
-        const y1 = this.config.get('top') + this.node.clientHeight / 2;
+        let x1 = this.config.get('left') + this.node.clientWidth;
+        let y1 = this.config.get('top') + this.node.clientHeight / 2;
+
+        let x2 = otherNode.configData.left;
+        let y2 = otherNode.configData.top + otherNode.node.clientHeight / 2;
+
+        if (x2 <= x1) {
+            y2 = otherNode.configData.top;
+            x2 = otherNode.configData.left + otherNode.node.clientWidth / 2;
+
+            if (y1 > y2) {
+                y2 = otherNode.configData.top + otherNode.node.clientHeight;
+            }
+        }
+
+        if (x2 <= x1) {
+            y1 = this.config.get('top') + this.node.clientHeight;
+            x1 = this.config.get('left') + otherNode.node.clientWidth / 2;
+
+            if (y1 > y2) {
+                y1 = this.config.get('top');
+            }
+        }
 
         // Find or create an edge
         const edge = document.getElementById(id) || document.createElement('div');
@@ -363,9 +384,7 @@ PERT.Node = class Node
         const critical = this.config.get('critical');
         const nodeConfig = node.configData;
 
-        // Point to the middle of the left side of the target node
-        const yOffset2 = nodeConfig.top + node.node.clientHeight / 2;
-        const edge = this.createEdge(nodeConfig.left, yOffset2, id);
+        const edge = this.createEdge(node, id);
         if (critical && nodeConfig.critical && !edge.classList.contains('critical')) {
             edge.classList.add('critical');
         } else if (!(critical && nodeConfig.critical) && edge.classList.contains('critical')) {
